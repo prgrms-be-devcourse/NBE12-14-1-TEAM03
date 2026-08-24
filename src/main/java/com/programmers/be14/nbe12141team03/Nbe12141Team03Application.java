@@ -1,0 +1,13 @@
+package com.programmers.be14.nbe12141team03;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Nbe12141Team03Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Nbe12141Team03Application.class, args);
+    }
+
+}
