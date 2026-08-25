@@ -68,7 +68,7 @@ public class OrderResultController {
     }
 
     //주문 생성
-    @PostMapping("/create")
+    @PostMapping
     public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest request) {
         OrderResult orderResult = orderResultService.createOrder(request);
 
