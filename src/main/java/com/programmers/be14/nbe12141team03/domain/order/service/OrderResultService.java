@@ -62,7 +62,12 @@ public class OrderResultService {
         //요청받은 상품 id로 주문 상품 구성
         for (Long productId : request.getProductIds()) {
             Product product = productRepository.findById(productId)
-                    .orElseThrow();
+                    .orElseThrow(() ->
+                            new ApiServiceException(
+                                    "404-1",
+                                    "해당 상품을 찾을 수 없습니다."
+                            )
+                    );
 
             OrderItem orderItem = new OrderItem(
                     product,
