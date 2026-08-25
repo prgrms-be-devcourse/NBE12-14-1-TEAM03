@@ -6,7 +6,13 @@ import java.util.List;
 
 @Getter
 public class OrderCreateRequest {
+
     private String email;
 
+    //product id 받기
     private List<Long> productIds;
+
+    private String shippingAddress;
+
+    private String zipCode;
 }
