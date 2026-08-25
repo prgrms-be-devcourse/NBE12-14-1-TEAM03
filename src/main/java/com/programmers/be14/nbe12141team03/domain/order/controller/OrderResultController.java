@@ -1,7 +1,9 @@
 package com.programmers.be14.nbe12141team03.domain.order.controller;
 
+import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
+import com.programmers.be14.nbe12141team03.global.dto.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +20,11 @@ public class OrderResultController {
 
     // [관리자] 다건 조회
     @GetMapping("/admin")
-    public List<OrderResult> adminOrderItemList() {
-        List<OrderResult> allOfOrderResultList = this.orderItemService.getAllList();
-        return allOfOrderResultList;
+    public RsData<List<OrderResultResponse>> adminOrderItemList() {
+        return new RsData<>(
+                "200-1",
+                "모든 고객의 전체 주문 내역을 조회했습니다.",
+                this.orderItemService.getAllList()
+        );
     }
-
 }
