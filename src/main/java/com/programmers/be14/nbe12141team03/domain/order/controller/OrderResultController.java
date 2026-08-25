@@ -31,16 +31,14 @@ public class OrderResultController {
 
     // [고객] 다건 조회
     @GetMapping("/my")
-    public List<OrderResultResponse> getMyOrders(
+    public RsData<List<OrderResultResponse>> getMyOrders(
             @RequestParam String email
     ){
-        List<OrderResult> orderResultList =  orderItemService.findMyOrders(email);
-
-        List<OrderResultResponse> orderResultResponseList = orderResultList.stream()
-                .map(OrderResultResponse::new)
-                .toList();
-
-        return orderResultResponseList;
+        return new RsData<>(
+                "200-1",
+                "현재 고객의 전체 주문 내역을 조회했습니다.",
+                this.orderItemService.findMyOrders(email)
+        );
     }
 
 }

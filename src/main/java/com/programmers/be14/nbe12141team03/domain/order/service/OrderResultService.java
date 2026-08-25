@@ -25,7 +25,11 @@ public class OrderResultService {
     }
 
     // [고객] 내 주문내역 조회
-    public List<OrderResult> findMyOrders(String email){
-        return orderResultRepository.findByEmail(email);
+    @Transactional(readOnly = true)
+    public List<OrderResultResponse> findMyOrders(String email){
+
+        return this.orderResultRepository.findByEmail(email).stream()
+                .map(OrderResultResponse::new)
+                .toList();
     }
 }
