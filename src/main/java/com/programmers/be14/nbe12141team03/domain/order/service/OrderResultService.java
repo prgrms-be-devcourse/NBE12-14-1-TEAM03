@@ -2,7 +2,6 @@ package com.programmers.be14.nbe12141team03.domain.order.service;
 
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderCreateRequest;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderItemRequest;
-import com.programmers.be14.nbe12141team03.domain.order.entity.OrderItem;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedItemResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedShipmentResponse;
@@ -182,5 +181,18 @@ public class OrderResultService {
         }
 
         return orderResultRepository.save(orderResult);
+    }
+
+    //주문 삭제
+    @Transactional
+    public void deleteOrder(Long id){
+        OrderResult orderResult = orderResultRepository.findById(id)
+                .orElseThrow(() ->
+                        new ApiServiceException(
+                                "404-1",
+                                "존재하지 않는 주문입니다."
+                        ));
+
+        orderResultRepository.delete(orderResult);
     }
 }

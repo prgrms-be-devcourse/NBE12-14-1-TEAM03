@@ -63,6 +63,19 @@ public class OrderResultController {
         return new OrderCreateResponse(orderResult);
     }
 
+    //주문 삭제
+    @DeleteMapping("/{id}")
+    public RsData<Void> deleteOrder(
+            @PathVariable Long id
+    ){
+        orderResultService.deleteOrder(id);
+
+        return new RsData<Void>(
+                "200-1",
+                "%d번 주문이 삭제되었습니다.".formatted(id)
+                );
+    }
+
     // [관리자] 배송일 기준 합배송 내역 조회
     @GetMapping("/admin/shipments")
     public RsData<List<MergedShipmentResponse>> adminShipmentList(
