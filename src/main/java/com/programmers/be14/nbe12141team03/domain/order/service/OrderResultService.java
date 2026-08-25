@@ -1,7 +1,7 @@
 package com.programmers.be14.nbe12141team03.domain.order.service;
-
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderCreateRequest;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderItem;
+import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.repository.OrderResultRepository;
 import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
@@ -21,9 +21,21 @@ public class OrderResultService {
     private final ProductRepository productRepository;
 
     // [관리자] 모든 고객의 모든 거래 내역 조회
-    public List<OrderResult> getAllList() {
-        List<OrderResult> allList = this.orderResultRepository.findAll();
-        return allList;
+    @Transactional(readOnly = true)
+    public List<OrderResultResponse> getAllList() {
+
+        return this.orderResultRepository.findAll().stream()
+                .map(OrderResultResponse::new)
+                .toList();
+    }
+
+    // [고객] 내 주문내역 조회
+    @Transactional(readOnly = true)
+    public List<OrderResultResponse> findMyOrders(String email){
+
+        return this.orderResultRepository.findByEmail(email).stream()
+                .map(OrderResultResponse::new)
+                .toList();
     }
 
     //고객 주문 생성
