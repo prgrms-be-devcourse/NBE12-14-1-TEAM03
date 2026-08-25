@@ -17,12 +17,12 @@ public class ProductController {
     private final ProductService productService;
 
 
-    @GetMapping("/list")
+    @GetMapping
     public List<ProductResponse> getProducts() {
         return productService.getProducts();
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public Product create(@Valid @RequestBody ProductCreateRequest request){
         return productService.create(request.getName(), request.getCategory(), request.getPrice(), request.getPhotoUrl());
     }
