@@ -4,51 +4,41 @@ import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Setter;
 
 @Getter
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 public class OrderItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CreatedDate
-    private LocalDateTime createDate;
+    // 주문 결과와의 N:1 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ORDER_RESULT_ID", nullable = false)
+    @Setter
+    private OrderResult orderResult;
 
-    @LastModifiedDate
-    private LocalDateTime modifyDate;
-
-    @Column(nullable = false)
-    private String email;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ORDER_ITEM_ID")
-    private List<Product> productList = new ArrayList<>();
+    // 상품과의 N:1 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_ID", nullable = false)
+    private Product product;
 
     @Column(nullable = false)
-    private String shippingAddress;
+    private int orderPrice; // 주문 당시 가격 (상품 가격 변동에 영향받지 않도록 저장)
 
     @Column(nullable = false)
-    private String zipCode;
+    private int quantity; // ⭐️주문 수량
 
-    private int totalPrice;
+    public OrderItem(Product product, int orderPrice, int quantity) {
+        this.product = product;
+        this.orderPrice = orderPrice;
+        this.quantity = quantity;
+    }
 
-    public OrderItem(String email, List<Product> productList, String shippingAddress,
-                     String zipCode, int totalPrice) {
-        this.email = email;
-        this.productList = productList;
-        this.shippingAddress = shippingAddress;
-        this.zipCode = zipCode;
-        this.totalPrice = totalPrice;
+    // 주문 상품 총 가격 계산
+    public int getTotalPrice() {
+        return orderPrice * quantity;
     }
 }
