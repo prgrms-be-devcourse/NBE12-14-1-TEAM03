@@ -1,11 +1,11 @@
 package com.programmers.be14.nbe12141team03.domain.product.controller;
 
+import com.programmers.be14.nbe12141team03.domain.product.dto.ProductCreateRequest;
 import com.programmers.be14.nbe12141team03.domain.product.dto.ProductResponse;
+import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import com.programmers.be14.nbe12141team03.domain.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,9 +16,14 @@ public class ProductController {
     private final ProductService productService;
 
 
-    @GetMapping
+    @GetMapping("/list")
     public List<ProductResponse> getProducts() {
         return productService.getProducts();
+    }
+
+    @PostMapping("/create")
+    public Product create(@RequestBody ProductCreateRequest request){
+        return productService.create(request.getName(), request.getCategory(), request.getPrice(), request.getPhotoUrl());
     }
 
 }
