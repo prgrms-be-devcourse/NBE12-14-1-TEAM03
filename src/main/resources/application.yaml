@@ -7,10 +7,18 @@ spring:
   datasource:
     url: jdbc:h2:~/team03db
     driver-class-name: org.h2.Driver
-    username: ${DB_USER}
-    password: ${DB_PWD}
+    username: ${DB_USER:sa} # 해당 환경변수가 없으면 sa 적용
+    password: ${DB_PWD:} # 해당 환경변수가 없으면 빈 문자열 적용
 
   h2:
     console:
       enabled: true
       path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update # 개발 환경에 따라 create 또는 create-drop 사용 가능
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
