@@ -1,6 +1,7 @@
 package com.programmers.be14.nbe12141team03.domain.order.controller;
 
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
+import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedShipmentResponse;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
@@ -16,24 +17,18 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderResultController {
 
-    private final OrderResultService orderItemService;
+    private final OrderResultService orderResultService;
 
-    // [관리자] 다건 조회 (shippingDate 파라미터가 없으면 전체 조회, shippingDate 파라미터가 있으면 해당 배송일의 주문 내역 조회)
+    // [관리자] 다건 조회
     @GetMapping("/admin")
-    public RsData<List<OrderResultResponse>> adminOrderItemList(
-            @RequestParam(required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shippingDate
-            ) {
-
-        List<OrderResultResponse> orders = (shippingDate == null) ? this.orderItemService.getAllList() : this.orderItemService.getListByShippingDate(shippingDate);
-
+    public RsData<List<OrderResultResponse>> adminOrderResultList() {
         return new RsData<>(
                 "200-1",
                 "모든 고객의 전체 주문 내역을 조회했습니다.",
-                orders
+                this.orderResultService.getAllList()
         );
     }
 
@@ -45,8 +40,18 @@ public class OrderResultController {
         return new RsData<>(
                 "200-1",
                 "현재 고객의 전체 주문 내역을 조회했습니다.",
-                this.orderItemService.findMyOrders(email)
+                this.orderResultService.findMyOrders(email)
         );
     }
 
+    // [관리자] 배송일 기준 합배송 내역 조회
+    @GetMapping("/admin/shipments")
+    public RsData<List<MergedShipmentResponse>> adminShipmentList(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shippingDate) {
+
+        return new RsData<>(
+                "200-1",
+                "해당 배송일의 합배송 내역을 조회했습니다.",
+                this.orderResultService.getMergedByShippingDate(shippingDate));
+    }
 }

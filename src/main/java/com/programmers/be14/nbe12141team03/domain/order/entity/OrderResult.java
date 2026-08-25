@@ -52,7 +52,14 @@ public class OrderResult {
         this.shippingAddress = shippingAddress;
         this.zipCode = zipCode;
     }
-    
+
+    // TODO: 배송일 테스트용 생성자 나중에 지우겠습니다!
+    public OrderResult(String email, String shippingAddress, String zipCode, LocalDate shippingDate) {
+        this(email, shippingAddress, zipCode);
+        this.shippingDate = shippingDate;
+    }
+
+
     // 연관관계 편의 메서드
     public void addOrderItem(OrderItem orderItem) {
         orderItemList.add(orderItem);
