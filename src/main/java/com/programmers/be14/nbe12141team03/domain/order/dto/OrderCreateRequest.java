@@ -9,8 +9,7 @@ public class OrderCreateRequest {
 
     private String email;
 
-    //product id 받기
-    private List<Long> productIds;
+    private List<OrderItemRequest> items;
 
     private String shippingAddress;
 
