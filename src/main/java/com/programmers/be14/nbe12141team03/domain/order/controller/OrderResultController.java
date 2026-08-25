@@ -1,10 +1,14 @@
 package com.programmers.be14.nbe12141team03.domain.order.controller;
 
+import com.programmers.be14.nbe12141team03.domain.order.dto.OrderCreateRequest;
+import com.programmers.be14.nbe12141team03.domain.order.dto.OrderCreateResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +43,14 @@ public class OrderResultController {
                 "현재 고객의 전체 주문 내역을 조회했습니다.",
                 this.orderItemService.findMyOrders(email)
         );
+    }
+
+    //주문 생성
+    @PostMapping("/create")
+    public OrderCreateResponse createOrder(@RequestBody OrderCreateRequest request) {
+        OrderResult orderResult = orderItemService.createOrder(request);
+
+        return new OrderCreateResponse(orderResult);
     }
 
 }
