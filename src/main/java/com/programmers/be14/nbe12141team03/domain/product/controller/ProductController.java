@@ -1,0 +1,24 @@
+package com.programmers.be14.nbe12141team03.domain.product.controller;
+
+import com.programmers.be14.nbe12141team03.domain.product.dto.ProductResponse;
+import com.programmers.be14.nbe12141team03.domain.product.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/products")
+public class ProductController {
+    private final ProductService productService;
+
+
+    @GetMapping
+    public List<ProductResponse> getProducts() {
+        return productService.getProducts();
+    }
+
+}
