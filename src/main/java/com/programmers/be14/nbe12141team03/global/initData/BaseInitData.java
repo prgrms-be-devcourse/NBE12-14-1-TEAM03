@@ -2,7 +2,8 @@ package com.programmers.be14.nbe12141team03.global.initData;
 
 
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderItem;
-import com.programmers.be14.nbe12141team03.domain.order.repository.OrderItemRepository;
+import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
+import com.programmers.be14.nbe12141team03.domain.order.repository.OrderResultRepository;
 import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import com.programmers.be14.nbe12141team03.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -23,7 +23,7 @@ public class BaseInitData {
     @Autowired
     @Lazy
     private BaseInitData self;
-    private final OrderItemRepository orderItemRepository;
+    private final OrderResultRepository orderResultRepository;
     private final ProductRepository productRepository;
 
 
@@ -49,20 +49,29 @@ public class BaseInitData {
 
     @Transactional
     public void work2() {
-        if (orderItemRepository.count() > 0) return;
+        if (orderResultRepository.count() > 0) return;
+        List<Product> products = productRepository.findAll();
 
-        List<Product> c = productRepository.findAll();
+        OrderResult o1 = new OrderResult(
+                "hoonhee@test.com",
+                "서울시 강남구 테헤란로 1", "06234");
+        o1.addOrderItem(new OrderItem(
+                products.get(0), products.get(0).getPrice(), 1));
+        o1.addOrderItem(new OrderItem(
+                products.get(1), products.get(1).getPrice(), 1));
 
-        OrderItem o1 = new OrderItem("hoonhee@test.com", List.of(c.get(0), c.get(1)),
-                "서울시 강남구 테헤란로 1", "06234", 11000);
+        OrderResult o2 = new OrderResult(
+                "hoonhee@test.com",
+                "서울시 강남구 테헤란로 1", "06234");
+        o2.addOrderItem(new OrderItem(
+                products.get(2), products.get(2).getPrice(), 1));
 
-        OrderItem o2 = new OrderItem("hoonhee@test.com", List.of(c.get(2)),
-                "서울시 강남구 테헤란로 1", "06234", 8000);
+        OrderResult o3 = new OrderResult("sujee@test.com",
+                "부산시 해운대구 우동 2", "48095");
+        o3.addOrderItem(new OrderItem(
+                products.get(3), products.get(3).getPrice(), 1));
 
-        OrderItem o3 = new OrderItem("sujee@test.com", List.of(c.get(3)),
-                "부산시 해운대구 우동 2", "48095", 5500);
-
-        orderItemRepository.saveAll(List.of(o1, o2, o3));
+        orderResultRepository.saveAll(List.of(o1, o2, o3));
     }
 
 }
