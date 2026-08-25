@@ -1,5 +1,6 @@
 package com.programmers.be14.nbe12141team03.domain.order.controller;
 
+import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +27,16 @@ public class OrderResultController {
 
     // [고객] 다건 조회
     @GetMapping("/my")
-    public List<OrderResult> getMyOrders(
+    public List<OrderResultResponse> getMyOrders(
             @RequestParam String email
     ){
-        return orderItemService.findMyOrders(email);
+        List<OrderResult> orderResultList =  orderItemService.findMyOrders(email);
+
+        List<OrderResultResponse> orderResultResponseList = orderResultList.stream()
+                .map(OrderResultResponse::new)
+                .toList();
+
+        return orderResultResponseList;
     }
 
 }
