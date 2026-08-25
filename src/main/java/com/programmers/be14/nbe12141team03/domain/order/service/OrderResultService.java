@@ -44,6 +44,14 @@ public class OrderResultService {
     public List<MergedShipmentResponse> getMergedByShippingDate(LocalDate shippingDate) {
         List<OrderResult> orders = this.orderResultRepository.findByShippingDate(shippingDate);
 
+        // 예외처리 적용
+        if (orders.isEmpty()) {
+            throw new ApiServiceException(
+                    "404-1",
+                    "해당 배송일에 주문 내역이 없습니다."
+            );
+        }
+
         // 배송일에 해당하는 주문 내역을 이메일, 배송주소, 우편번호를 기준으로 딕셔너리 생성
         Map<String, List<OrderResult>> groupByEmail = orders.stream()
                 .collect(Collectors.groupingBy(key ->
