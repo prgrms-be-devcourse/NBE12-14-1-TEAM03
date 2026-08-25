@@ -1,6 +1,5 @@
 package com.programmers.be14.nbe12141team03.domain.order.controller;
 
-import com.programmers.be14.nbe12141team03.domain.order.entity.OrderItem;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,8 @@ public class OrderResultController {
     // [관리자] 다건 조회
     @GetMapping("/admin")
     public List<OrderResult> adminOrderItemList() {
-        List<OrderResult> allOfOrderItemList = this.orderItemService.getAllList();
-        return allOfOrderItemList;
+        List<OrderResult> allOfOrderResultList = this.orderItemService.getAllList();
+        return allOfOrderResultList;
     }
 
     // [고객] 다건 조회
