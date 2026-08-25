@@ -5,10 +5,13 @@ import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,13 +21,22 @@ public class OrderResultController {
 
     private final OrderResultService orderItemService;
 
-    // [관리자] 다건 조회
+    // [관리자] 다건 조회 (shippingDate 파라미터가 없으면 전체 조회, shippingDate 파라미터가 있으면 해당 배송일의 주문 내역 조회)
     @GetMapping("/admin")
-    public RsData<List<OrderResultResponse>> adminOrderItemList() {
+    public RsData<List<OrderResultResponse>> adminOrderItemList(
+            @RequestParam(required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shippingDate
+            ) {
+
+        List<OrderResultResponse> orders = (shippingDate == null) ? this.orderItemService.getAllList() : this.orderItemService.getListByShippingDate(shippingDate);
+
         return new RsData<>(
                 "200-1",
                 "모든 고객의 전체 주문 내역을 조회했습니다.",
-                this.orderItemService.getAllList()
+                orders
         );
     }
+
+
+
 }
