@@ -40,6 +40,18 @@ public class OrderResultController {
         );
     }
 
+    // [고객] 단건 조회
+    @GetMapping("/my/{id}")
+    public RsData<OrderResultResponse> getMyOrderById(
+            @RequestParam Long id
+    ){
+        return new RsData<>(
+                "200-1",
+                "현재 고객의 주문 내역 중 선택한 ID의 내역을 조회했습니다.",
+                this.orderItemService.findMyOrderById(id)
+        );
+    }
+
     //주문 생성
     @PostMapping("/create")
     public OrderCreateResponse createOrder(@RequestBody OrderCreateRequest request) {
