@@ -15,7 +15,7 @@ public class OrderResultService {
 
     // [관리자] 모든 고객의 모든 거래 내역 조회
     public List<OrderResult> getAllList() {
-        List<OrderResult> allList = this.orderResultRepository.findAll();
-        return allList;
+        List<OrderResult> allResultList = this.orderResultRepository.findAll();
+        return allResultList;
     }
 }
