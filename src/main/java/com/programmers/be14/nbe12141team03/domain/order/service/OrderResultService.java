@@ -6,6 +6,7 @@ import com.programmers.be14.nbe12141team03.domain.order.repository.OrderResultRe
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import com.programmers.be14.nbe12141team03.domain.product.repository.ProductRepository;
+import com.programmers.be14.nbe12141team03.global.exception.ApiServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,12 @@ public class OrderResultService {
         //요청받은 상품 id로 주문 상품 구성
         for (Long productId : request.getProductIds()) {
             Product product = productRepository.findById(productId)
-                    .orElseThrow();
+                    .orElseThrow(() ->
+                            new ApiServiceException(
+                                    "404-1",
+                                    "해당 상품을 찾을 수 없습니다."
+                            )
+                    );
 
             OrderItem orderItem = new OrderItem(
                     product,
