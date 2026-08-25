@@ -7,6 +7,7 @@ import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.Merge
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -57,10 +58,23 @@ public class OrderResultController {
 
     //주문 생성
     @PostMapping("/create")
-    public OrderCreateResponse createOrder(@RequestBody OrderCreateRequest request) {
+    public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest request) {
         OrderResult orderResult = orderResultService.createOrder(request);
 
         return new OrderCreateResponse(orderResult);
+    }
+
+    //주문 삭제
+    @DeleteMapping("/{id}")
+    public RsData<Void> deleteOrder(
+            @PathVariable Long id
+    ){
+        orderResultService.deleteOrder(id);
+
+        return new RsData<Void>(
+                "200-1",
+                "%d번 주문이 삭제되었습니다.".formatted(id)
+                );
     }
 
     // [관리자] 배송일 기준 합배송 내역 조회
