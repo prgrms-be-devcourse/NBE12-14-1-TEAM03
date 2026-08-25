@@ -1,11 +1,9 @@
 package com.programmers.be14.nbe12141team03.domain.order.repository;
 
-import com.programmers.be14.nbe12141team03.domain.order.entity.OrderItem;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 

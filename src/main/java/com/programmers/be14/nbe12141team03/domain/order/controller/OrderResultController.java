@@ -8,13 +8,8 @@ import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -56,14 +51,14 @@ public class OrderResultController {
         return new RsData<>(
                 "200-1",
                 "현재 고객의 주문 내역 중 선택한 ID의 내역을 조회했습니다.",
-                this.orderItemService.findMyOrderById(id)
+                this.orderResultService.findMyOrderById(id)
         );
     }
 
     //주문 생성
     @PostMapping("/create")
     public OrderCreateResponse createOrder(@RequestBody OrderCreateRequest request) {
-        OrderResult orderResult = orderItemService.createOrder(request);
+        OrderResult orderResult = orderResultService.createOrder(request);
 
         return new OrderCreateResponse(orderResult);
     }
