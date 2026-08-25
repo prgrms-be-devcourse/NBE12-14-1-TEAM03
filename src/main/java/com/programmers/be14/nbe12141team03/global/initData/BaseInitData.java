@@ -58,7 +58,7 @@ public class BaseInitData {
         o1.addOrderItem(new OrderItem(
                 products.get(0), products.get(0).getPrice(), 1));
         o1.addOrderItem(new OrderItem(
-                products.get(1), products.get(1).getPrice(), 1));
+                products.get(0), products.get(0).getPrice(), 3));
 
         OrderResult o2 = new OrderResult(
                 "hoonhee@test.com",
