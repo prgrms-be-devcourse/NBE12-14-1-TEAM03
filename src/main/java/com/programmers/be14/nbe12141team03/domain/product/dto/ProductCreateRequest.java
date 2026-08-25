@@ -1,4 +1,4 @@
-package com.programmers.be14.nbe12141team03.domain.dto;
+package com.programmers.be14.nbe12141team03.domain.product.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
