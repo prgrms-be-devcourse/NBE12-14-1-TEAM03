@@ -1,6 +1,5 @@
 package com.programmers.be14.nbe12141team03.domain.order.entity;
 
-import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
