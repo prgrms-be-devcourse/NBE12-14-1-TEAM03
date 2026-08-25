@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderResultController {
 
-    private final OrderResultService orderItemService;
+    private final OrderResultService orderResultService;
 
     // [관리자] 다건 조회
     @GetMapping("/admin")
@@ -24,7 +24,7 @@ public class OrderResultController {
         return new RsData<>(
                 "200-1",
                 "모든 고객의 전체 주문 내역을 조회했습니다.",
-                this.orderItemService.getAllList()
+                this.orderResultService.getAllList()
         );
     }
 
@@ -36,7 +36,7 @@ public class OrderResultController {
         return new RsData<>(
                 "200-1",
                 "현재 고객의 전체 주문 내역을 조회했습니다.",
-                this.orderItemService.findMyOrders(email)
+                this.orderResultService.findMyOrders(email)
         );
     }
 
@@ -48,14 +48,14 @@ public class OrderResultController {
         return new RsData<>(
                 "200-1",
                 "현재 고객의 주문 내역 중 선택한 ID의 내역을 조회했습니다.",
-                this.orderItemService.findMyOrderById(id)
+                this.orderResultService.findMyOrderById(id)
         );
     }
 
     //주문 생성
     @PostMapping("/create")
     public OrderCreateResponse createOrder(@RequestBody OrderCreateRequest request) {
-        OrderResult orderResult = orderItemService.createOrder(request);
+        OrderResult orderResult = orderResultService.createOrder(request);
 
         return new OrderCreateResponse(orderResult);
     }
@@ -65,7 +65,7 @@ public class OrderResultController {
     public RsData<Void> deleteOrder(
             @PathVariable Long id
     ){
-        orderItemService.deleteOrder(id);
+        orderResultService.deleteOrder(id);
 
         return new RsData<Void>(
                 "200-1",

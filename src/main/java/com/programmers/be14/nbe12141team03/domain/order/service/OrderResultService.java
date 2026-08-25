@@ -101,6 +101,7 @@ public class OrderResultService {
     }
 
     //주문 삭제
+    @Transactional
     public void deleteOrder(Long id){
         OrderResult orderResult = orderResultRepository.findById(id)
                 .orElseThrow(() ->
