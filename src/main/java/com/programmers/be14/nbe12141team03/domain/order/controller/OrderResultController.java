@@ -46,7 +46,7 @@ public class OrderResultController {
     // [고객] 단건 조회
     @GetMapping("/my/{id}")
     public RsData<OrderResultResponse> getMyOrderById(
-            @RequestParam Long id
+            @PathVariable Long id
     ){
         return new RsData<>(
                 "200-1",
