@@ -12,9 +12,8 @@ public class OrderCreateRequest {
     @NotBlank(message = "Email를 입력해주세요.")
     private String email;
 
-    //product id 받기. 아래 NotNull은 List에 null이 들어오는 것을 방지하기 위함
-    @NotEmpty(message = "구매하실 상품을 하나 이상 선택해주세요.")
-    private List<@NotNull(message = "상품 ID는 필수입니다.") Long> productIds;
+    @NotEmpty(message = "구매 상품을 하나 이상 선택해주세요.")
+    private List<OrderItemRequest> items;
 
     @NotBlank(message = "배송지를 입력해주세요.")
     private String shippingAddress;
