@@ -4,83 +4,41 @@ import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Setter;
 
 @Getter
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 public class OrderItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CreatedDate
-    private LocalDateTime createDate;
+    // 주문 결과와의 N:1 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ORDER_RESULT_ID", nullable = false)
+    @Setter
+    private OrderResult orderResult;
 
-    @LastModifiedDate
-    private LocalDateTime modifyDate;
-
-    @Column(nullable = false)
-    private String email;
-
-    @ManyToMany()   // cascade = CascadeType.ALL 적용 시 주문 취소 -> 상품 삭제라서 우선 제거했습니다.
-    @JoinTable(
-            name = "order_product",
-            joinColumns = @JoinColumn(name = "order_item_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> productList = new ArrayList<>();
+    // 상품과의 N:1 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_ID", nullable = false)
+    private Product product;
 
     @Column(nullable = false)
-    private String shippingAddress;
+    private int orderPrice; // 주문 당시 가격 (상품 가격 변동에 영향받지 않도록 저장)
 
     @Column(nullable = false)
-    private String zipCode;
+    private int quantity; // ⭐️주문 수량
 
-    private int totalPrice;
-
-    private LocalDate shippingDate; // 배송일
-
-    public OrderItem(String email, List<Product> productList, String shippingAddress,
-                     String zipCode, int totalPrice) {
-        this.email = email;
-        this.productList = productList;
-        this.shippingAddress = shippingAddress;
-        this.zipCode = zipCode;
-        this.totalPrice = totalPrice;
+    public OrderItem(Product product, int orderPrice, int quantity) {
+        this.product = product;
+        this.orderPrice = orderPrice;
+        this.quantity = quantity;
     }
 
-    // @EntityListeners(AuditingEntityListener.class)를 사용하면 레포지토리에서 save를 할 때 생성일자등의 생성이 동작한다고 합니다.
-    // @PrePersist를 사용하면 생성일자가 결정된 이후 계산이 가능해서 14:00가 넘은 주문을 당일 배송으로 계산하는 버그를 방지했습니다.
-    @PrePersist
-    public void initShippingDate() {
-        if (shippingDate == null) {
-            this.shippingDate = calculateShipping(this.createDate);
-        }
-    }
-
-    // 배송일 계산
-    private LocalDate calculateShipping(LocalDateTime createDate){
-        // 주문한 시간
-        LocalTime currentTime = createDate.toLocalTime();
-        // 기준 시간
-        LocalTime baseTime = LocalTime.of(14, 0);
-
-        // 14:00 미만의 주문은 당일 배송
-        if (currentTime.isBefore(baseTime)) {
-            return createDate.toLocalDate();
-        }
-        // 넘어가면 다음 날 배송
-        return createDate.toLocalDate().plusDays(1);
+    // 주문 상품 총 가격 계산
+    public int getTotalPrice() {
+        return orderPrice * quantity;
     }
 }
