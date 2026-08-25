@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Configuration
@@ -52,26 +53,31 @@ public class BaseInitData {
         if (orderResultRepository.count() > 0) return;
         List<Product> products = productRepository.findAll();
 
-        OrderResult o1 = new OrderResult(
-                "hoonhee@test.com",
-                "서울시 강남구 테헤란로 1", "06234");
-        o1.addOrderItem(new OrderItem(
-                products.get(0), products.get(0).getPrice(), 1));
-        o1.addOrderItem(new OrderItem(
-                products.get(0), products.get(0).getPrice(), 3));
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
 
-        OrderResult o2 = new OrderResult(
-                "hoonhee@test.com",
-                "서울시 강남구 테헤란로 1", "06234");
-        o2.addOrderItem(new OrderItem(
-                products.get(2), products.get(2).getPrice(), 1));
+        // 오늘 배송 - 합배송 대상 ①
+        OrderResult o1 = new OrderResult("hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234", today);
+        o1.addOrderItem(new OrderItem(products.get(0), products.get(0).getPrice(), 2));
+        o1.addOrderItem(new OrderItem(products.get(1), products.get(1).getPrice(), 1));
 
-        OrderResult o3 = new OrderResult("sujee@test.com",
-                "부산시 해운대구 우동 2", "48095");
-        o3.addOrderItem(new OrderItem(
-                products.get(3), products.get(3).getPrice(), 1));
+        // 오늘 배송 - 합배송 대상 ② (같은 이메일)
+        OrderResult o2 = new OrderResult("hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234", today);
+        o2.addOrderItem(new OrderItem(products.get(0), products.get(0).getPrice(), 3));
 
-        orderResultRepository.saveAll(List.of(o1, o2, o3));
+        // 오늘 배송 - 다른 고객
+        OrderResult o3 = new OrderResult("sujee@test.com", "부산시 해운대구 우동 2", "48095", today);
+        o3.addOrderItem(new OrderItem(products.get(3), products.get(3).getPrice(), 1));
+
+        // 내일 배송
+        OrderResult o4 = new OrderResult("heewon@test.com", "대전시 유성구 3", "34126", tomorrow);
+        o4.addOrderItem(new OrderItem(products.get(1), products.get(1).getPrice(), 2));
+
+        // 모레 배송
+        OrderResult o5 = new OrderResult("jaechul@test.com", "인천시 연수구 4", "21999", today.plusDays(2));
+        o5.addOrderItem(new OrderItem(products.get(2), products.get(2).getPrice(), 1));
+
+        orderResultRepository.saveAll(List.of(o1, o2, o3, o4, o5));
     }
 
 }
