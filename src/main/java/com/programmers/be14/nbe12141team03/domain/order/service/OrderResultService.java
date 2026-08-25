@@ -6,6 +6,7 @@ import com.programmers.be14.nbe12141team03.domain.order.repository.OrderResultRe
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import com.programmers.be14.nbe12141team03.domain.product.repository.ProductRepository;
+import com.programmers.be14.nbe12141team03.global.exception.ApiServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,15 @@ public class OrderResultService {
         return this.orderResultRepository.findByEmail(email).stream()
                 .map(OrderResultResponse::new)
                 .toList();
+    }
+
+    // [고객] 선택한 주문내역의 ID를 통해 단건 조회
+    @Transactional(readOnly = true)
+    public OrderResultResponse findMyOrderById(Long id){
+        return new OrderResultResponse(
+                this.orderResultRepository.findById(id).orElseThrow(() ->
+                        new ApiServiceException("404-1",
+                                "해당 ID의 주문 내역은 존재하지 않습니다.")));
     }
 
     //고객 주문 생성
