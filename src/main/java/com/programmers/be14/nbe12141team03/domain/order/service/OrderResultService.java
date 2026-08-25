@@ -1,7 +1,6 @@
 package com.programmers.be14.nbe12141team03.domain.order.service;
 
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
-import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.repository.OrderResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,4 +22,5 @@ public class OrderResultService {
                 .map(OrderResultResponse::new)
                 .toList();
     }
+
 }
