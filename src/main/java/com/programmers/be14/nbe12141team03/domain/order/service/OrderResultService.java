@@ -40,6 +40,15 @@ public class OrderResultService {
                 .toList();
     }
 
+    // [고객] 선택한 주문내역의 ID를 통해 단건 조회
+    @Transactional(readOnly = true)
+    public OrderResultResponse findMyOrderById(Long id){
+        return new OrderResultResponse(
+                this.orderResultRepository.findById(id).orElseThrow(() ->
+                        new ApiServiceException("404-1",
+                                "해당 ID의 주문 내역은 존재하지 않습니다.")));
+    }
+
     // [고객] 주문 생성
     @Transactional
     public OrderResult createOrder(OrderCreateRequest request) {
