@@ -1,11 +1,13 @@
 package com.programmers.be14.nbe12141team03.global.exception;
 
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,4 +55,22 @@ public class GlobalExceptionHandler {
     //     }
     // }
     //
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<RsData<?>> handleHandlerMethodValidationException(
+            HandlerMethodValidationException e
+    ){
+        String defaultMsg = e.getParameterValidationResults().stream()
+                .flatMap(result -> result.getResolvableErrors().stream())
+                .findFirst()
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .orElse("잘못된 요청입니다.");
+
+        RsData<?> rsData = new RsData<>(
+                "400-1",
+                defaultMsg
+        );
+
+        return ResponseEntity.status(rsData.getStatusCode()).body(rsData);
+    }
 }
