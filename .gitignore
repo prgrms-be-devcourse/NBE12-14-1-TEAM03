@@ -38,3 +38,4 @@ out/
 
 ### custom ###
 .env
+.agents/rules/grinds-n-circle-style-rules.md
