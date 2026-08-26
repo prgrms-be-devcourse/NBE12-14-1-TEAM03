@@ -1,9 +1,10 @@
 package com.programmers.be14.nbe12141team03.domain.order.controller;
 
-import com.programmers.be14.nbe12141team03.domain.order.dto.OrderCreateRequest;
-import com.programmers.be14.nbe12141team03.domain.order.dto.OrderCreateResponse;
+import com.programmers.be14.nbe12141team03.domain.order.dto.create.OrderCreateRequest;
+import com.programmers.be14.nbe12141team03.domain.order.dto.create.OrderCreateResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedShipmentResponse;
+import com.programmers.be14.nbe12141team03.domain.order.dto.modify.OrderModifyRequest;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
@@ -51,6 +52,22 @@ public class OrderResultController {
                 this.orderResultService.getMergedByShippingDate(shippingDate));
     }
 
+    // [관리자] 주문 내역 수정
+    @Operation(summary = "주문 수정")
+    @Tag(name = "공용")
+    @PatchMapping("/{id}")
+    public RsData<OrderResultResponse> modifyOrderResult(
+            @PathVariable Long id,
+            @Valid @RequestBody OrderModifyRequest request
+    ) {
+        return new RsData<>(
+                "200-1",
+                "%d번 주문이 수정되었습니다.".formatted(id),
+                this.orderResultService.modifyOrderResult(id, request)
+        );
+    }
+
+
     // [고객] 다건 조회
     @Operation(summary = "자신의 주문 내역 다건 조회")
     @Tag(name = "공용")
@@ -92,10 +109,14 @@ public class OrderResultController {
     @Operation(summary = "주문 생성")
     @Tag(name = "공용")
     @PostMapping
-    public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest request) {
+    public RsData<OrderCreateResponse> createOrder(@Valid @RequestBody OrderCreateRequest request) {
         OrderResult orderResult = orderResultService.createOrder(request);
 
-        return new OrderCreateResponse(orderResult);
+        return new RsData<>(
+                "200-1",
+                "%d번 주문이 생성되었습니다.".formatted(orderResult.getId()),
+                new OrderCreateResponse(orderResult)
+        );
     }
 
     // 주문 삭제

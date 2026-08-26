@@ -5,7 +5,7 @@ spring:
   application:
     name: NBE12-14-1-TEAM03
   datasource:
-    url: jdbc:h2:~/team03db # ~ : 사용자 디렉터리(Users/사용자_이름)
+    url: jdbc:h2:./team03db # ~ : 사용자 디렉터리(Users/사용자_이름)
     driver-class-name: org.h2.Driver
     username: ${DB_USER:sa} # 해당 환경변수가 없으면 sa 적용
     password: ${DB_PWD:} # 해당 환경변수가 없으면 빈 문자열 적용
