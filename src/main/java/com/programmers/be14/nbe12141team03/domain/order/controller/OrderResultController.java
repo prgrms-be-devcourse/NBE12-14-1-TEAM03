@@ -35,12 +35,21 @@ public class OrderResultController {
     // [고객] 다건 조회
     @GetMapping("/my")
     public RsData<List<OrderResultResponse>> getMyOrders(
-            @RequestParam String email
+            @RequestParam
+            @NotBlank(message = "Email을 입력해 주세요.")
+            @Email(message = "올바른 Email의 형식이 아닙니다.")
+            String email
     ){
+        List<OrderResultResponse> orders = this.orderResultService.findMyOrders(email);
+
+        String message = orders.isEmpty()
+                ? "주문 내역이 없습니다."
+                : "현재 고객의 전체 주문 내역을 조회했습니다.";
+
         return new RsData<>(
                 "200-1",
-                "현재 고객의 전체 주문 내역을 조회했습니다.",
-                this.orderResultService.findMyOrders(email)
+                message,
+                orders
         );
     }
 
@@ -56,8 +65,8 @@ public class OrderResultController {
         );
     }
 
-    // 주문 생성
-    @PostMapping("/create")
+    //주문 생성
+    @PostMapping
     public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest request) {
         OrderResult orderResult = orderResultService.createOrder(request);
 
