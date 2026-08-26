@@ -54,7 +54,7 @@ public class OrderResultController {
     // [고객] 다건 조회
     @Operation(summary = "자신의 주문 내역 다건 조회")
     @Tag(name = "공용")
-    @GetMapping("/my")
+    @GetMapping("/mypage")
     public RsData<List<OrderResultResponse>> getMyOrders(
             @RequestParam
             @NotBlank(message = "Email을 입력해 주세요.")
@@ -77,7 +77,7 @@ public class OrderResultController {
     // [고객] 단건 조회
     @Operation(summary = "주문 내역 단건 조회")
     @Tag(name = "공용")
-    @GetMapping("/my/{id}")
+    @GetMapping("/mypage/{id}")
     public RsData<OrderResultResponse> getMyOrderById(
             @PathVariable Long id
     ){
