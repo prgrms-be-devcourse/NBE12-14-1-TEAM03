@@ -56,7 +56,7 @@ public class OrderResultController {
         );
     }
 
-    //주문 생성
+    // 주문 생성
     @PostMapping("/create")
     public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest request) {
         OrderResult orderResult = orderResultService.createOrder(request);
@@ -64,7 +64,7 @@ public class OrderResultController {
         return new OrderCreateResponse(orderResult);
     }
 
-    //주문 삭제
+    // 주문 삭제
     @DeleteMapping("/{id}")
     public RsData<Void> deleteOrder(
             @PathVariable Long id
