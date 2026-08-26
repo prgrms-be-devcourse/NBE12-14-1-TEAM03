@@ -1,4 +1,4 @@
-package com.programmers.be14.nbe12141team03.domain.order.dto;
+package com.programmers.be14.nbe12141team03.domain.order.dto.create;
 
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import lombok.Getter;
