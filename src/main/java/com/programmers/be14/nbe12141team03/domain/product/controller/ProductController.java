@@ -4,6 +4,7 @@ import com.programmers.be14.nbe12141team03.domain.product.dto.ProductCreateReque
 import com.programmers.be14.nbe12141team03.domain.product.dto.ProductResponse;
 import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import com.programmers.be14.nbe12141team03.domain.product.service.ProductService;
+import com.programmers.be14.nbe12141team03.global.dto.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,8 +23,12 @@ public class ProductController {
     @Tag(name = "공용")
     @Operation(summary = "상품 다건 조회")
     @GetMapping
-    public List<ProductResponse> getProducts() {
-        return productService.getProducts();
+    public RsData<List<ProductResponse>> getProducts() {
+        return new RsData<>(
+                "200-1",
+                "상품 목록을 조회했습니다.",
+                productService.getProducts()
+        );
     }
 
 
@@ -31,8 +36,19 @@ public class ProductController {
     @Tag(name = "관리자")
     @Operation(summary = "상품 추가")
     @PostMapping("/admin")
-    public Product create(@Valid @RequestBody ProductCreateRequest request){
-        return productService.create(request.getName(), request.getCategory(), request.getPrice(), request.getPhotoUrl());
+    public RsData<ProductResponse> create(@Valid @RequestBody ProductCreateRequest request){
+        Product product = productService.create(
+                request.getName(),
+                request.getCategory(),
+                request.getPrice(),
+                request.getPhotoUrl()
+        );
+
+        return new RsData<>(
+                "200-1",
+                "%d번 상품이 추가되었습니다.".formatted(product.getId()),
+                new ProductResponse(product)
+        );
     }
 
 }
