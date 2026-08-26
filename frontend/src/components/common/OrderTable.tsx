@@ -30,6 +30,7 @@ export interface OrderTableProps {
   removeLabel?: "취소" | "삭제";
   onRemove: (orderId: number) => void;
   showActions?: (order: Order) => boolean;
+  showCustomerEmail?: boolean;
 };
 
 export default function OrderTable({
@@ -38,6 +39,7 @@ export default function OrderTable({
   removeLabel = "취소",
   onRemove,
   showActions = () => true,
+  showCustomerEmail = false,
 }: OrderTableProps) {
   const router = useRouter();
 
@@ -57,6 +59,12 @@ export default function OrderTable({
             <th scope="col" className="text-nowrap">
               주문 날짜
             </th>
+            {showCustomerEmail && (
+              <th scope="col" className="text-nowrap">
+                고객 이메일
+              </th>
+            )}
+
             <th scope="col">상품</th>
             <th scope="col" className="text-end text-nowrap">
               총금액
@@ -79,6 +87,12 @@ export default function OrderTable({
                 <td className="text-nowrap">
                   {formatDateTime(order.createDate)}
                 </td>
+
+                {showCustomerEmail && (
+                  <td className="text-nowrap">
+                    {order.email}
+                  </td>
+                )}
 
                 <td>{formatProductSummary(order.orderItemList)}</td>
 
@@ -158,3 +172,16 @@ function formatDateTime(dateTime: string): string {
 function formatShippingDate(date: string): string {
   return date.replaceAll("-", ".");
 }
+
+/*
+사용 예시
+
+<OrderTable
+orders={orders.data}
+editPath={(orderId) => `/orders/${orderId}/edit`}
+removeLabel="취소"
+onRemove={handleCancelOrder}
+showActions={isEditable}
+showCustomerEmail
+/>
+ */
