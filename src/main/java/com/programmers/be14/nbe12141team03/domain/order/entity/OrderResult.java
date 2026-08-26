@@ -90,4 +90,22 @@ public class OrderResult {
         // 넘어가면 다음 날 배송
         return createDate.toLocalDate().plusDays(1);
     }
+
+    // 주문 내역 수정 가능 여부 배송일에서 14:00를 넘었으면 주문 수정 불가
+    public boolean isModifiable(LocalDateTime now) {
+        return now.isBefore(this.shippingDate.atTime(14, 0));
+    }
+
+    // 주문 내역 수정
+    public void modify(String shippingAddress, String zipCode, List<OrderItem> newItemList) {
+        this.shippingAddress = shippingAddress;
+        this.zipCode = zipCode;
+
+        // 기존 주문 상품을 고아로 만들어서 DB에서 삭제
+        this.orderItemList.clear();
+        this.totalPrice = 0;
+
+        // 주문 상품 재등록
+        newItemList.forEach(this::addOrderItem);
+    }
 }

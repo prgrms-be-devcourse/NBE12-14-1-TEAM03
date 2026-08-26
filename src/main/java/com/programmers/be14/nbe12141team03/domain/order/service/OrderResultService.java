@@ -1,10 +1,11 @@
 package com.programmers.be14.nbe12141team03.domain.order.service;
 
-import com.programmers.be14.nbe12141team03.domain.order.dto.OrderCreateRequest;
+import com.programmers.be14.nbe12141team03.domain.order.dto.create.OrderCreateRequest;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderItemRequest;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedItemResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedShipmentResponse;
+import com.programmers.be14.nbe12141team03.domain.order.dto.modify.OrderModifyRequest;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderItem;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.repository.OrderResultRepository;
@@ -16,9 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -194,5 +197,47 @@ public class OrderResultService {
                         ));
 
         orderResultRepository.delete(orderResult);
+    }
+
+    // 주문 수정
+    @Transactional
+    public OrderResultResponse modifyOrderResult(Long id, OrderModifyRequest request){
+
+        // 주문 내역 존재 여부 예외 처리
+        OrderResult origin = this.orderResultRepository.findById(id)
+                .orElseThrow(() -> new ApiServiceException(
+                        "404-1",
+                        "존재하지 않는 주문입니다"
+                ));
+
+        // 이미 배송일이 지난 상품 예외 처리
+        if (!origin.isModifiable(LocalDateTime.now())) {
+            throw new ApiServiceException(
+                    "400-1",
+                    "이미 배송 준비가 시작되어 수정할 수 없습니다."
+            );
+        }
+
+        // 상품 존재 여부 예외 처리 및 새로운 리스트 생성
+        List<OrderItem> modifiedItemList = request.orderItemList().stream()
+                        .map(req -> {
+                            Product product = this.productRepository.findById(req.productId())
+                                    .orElseThrow(() -> new ApiServiceException(
+                                            "404-2",
+                                            "%d번 상품을 찾을 수 없습니다.".formatted(req.productId())));
+                            return new OrderItem(product, product.getPrice(), req.quantity());
+                        })
+                        .toList();
+
+        origin.modify(
+                request.shippingAddress(),
+                request.zipCode(),
+                modifiedItemList
+        );
+
+        // 이 시점에 실제 DB 업데이트를 통해 응답의 수정 시각이 정확하게 반영되도록 함
+        this.orderResultRepository.flush();
+
+        return new OrderResultResponse(origin);
     }
 }
