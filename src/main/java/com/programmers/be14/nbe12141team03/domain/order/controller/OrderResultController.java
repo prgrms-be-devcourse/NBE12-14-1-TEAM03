@@ -7,6 +7,8 @@ import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.Merge
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.service.OrderResultService;
 import com.programmers.be14.nbe12141team03.global.dto.RsData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +27,8 @@ public class OrderResultController {
     private final OrderResultService orderResultService;
 
     // [관리자] 다건 조회
+    @Operation(summary = "전체 주문 내역 다건 조회")
+    @Tag(name = "관리자")
     @GetMapping("/admin")
     public RsData<List<OrderResultResponse>> adminOrderResultList() {
         return new RsData<>(
@@ -34,7 +38,22 @@ public class OrderResultController {
         );
     }
 
+    // [관리자] 배송일 기준 합배송 내역 조회
+    @Operation(summary = "합배송 다건 조회")
+    @Tag(name = "관리자")
+    @GetMapping("/admin/shipments")
+    public RsData<List<MergedShipmentResponse>> adminShipmentList(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shippingDate) {
+
+        return new RsData<>(
+                "200-1",
+                "해당 배송일의 합배송 내역을 조회했습니다.",
+                this.orderResultService.getMergedByShippingDate(shippingDate));
+    }
+
     // [고객] 다건 조회
+    @Operation(summary = "자신의 주문 내역 다건 조회")
+    @Tag(name = "공용")
     @GetMapping("/my")
     public RsData<List<OrderResultResponse>> getMyOrders(
             @RequestParam
@@ -56,6 +75,8 @@ public class OrderResultController {
     }
 
     // [고객] 단건 조회
+    @Operation(summary = "주문 내역 단건 조회")
+    @Tag(name = "공용")
     @GetMapping("/my/{id}")
     public RsData<OrderResultResponse> getMyOrderById(
             @PathVariable Long id
@@ -67,7 +88,9 @@ public class OrderResultController {
         );
     }
 
-    //주문 생성
+    // 주문 생성
+    @Operation(summary = "주문 생성")
+    @Tag(name = "공용")
     @PostMapping
     public OrderCreateResponse createOrder(@Valid @RequestBody OrderCreateRequest request) {
         OrderResult orderResult = orderResultService.createOrder(request);
@@ -75,7 +98,9 @@ public class OrderResultController {
         return new OrderCreateResponse(orderResult);
     }
 
-    //주문 삭제
+    // 주문 삭제
+    @Operation(summary = "주문 삭제")
+    @Tag(name = "공용")
     @DeleteMapping("/{id}")
     public RsData<Void> deleteOrder(
             @PathVariable Long id
@@ -88,14 +113,5 @@ public class OrderResultController {
                 );
     }
 
-    // [관리자] 배송일 기준 합배송 내역 조회
-    @GetMapping("/admin/shipments")
-    public RsData<List<MergedShipmentResponse>> adminShipmentList(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate shippingDate) {
 
-        return new RsData<>(
-                "200-1",
-                "해당 배송일의 합배송 내역을 조회했습니다.",
-                this.orderResultService.getMergedByShippingDate(shippingDate));
-    }
 }
