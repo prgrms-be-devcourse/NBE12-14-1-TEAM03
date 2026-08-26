@@ -8,7 +8,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body className="min-vh-100">{children}</body>
     </html>
   );
 }
