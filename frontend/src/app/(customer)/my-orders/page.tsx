@@ -1,6 +1,6 @@
 'use client'
 
-import OrderTable from "@/components/OrderTable";
+import OrderTable from "@/components/common/OrderTable";
 
 export default function MyOrdersPage(){
     const mockOrders = {
