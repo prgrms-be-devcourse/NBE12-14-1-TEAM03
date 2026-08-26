@@ -1,11 +1,11 @@
 spring:
   config:
     import:
-      - optional:file:.env[.properties]
+      - optional:file:.env[.properties] # 프로젝트 루트의 .env 파일 지정
   application:
     name: NBE12-14-1-TEAM03
   datasource:
-    url: jdbc:h2:~/team03db
+    url: jdbc:h2:~/team03db # ~ : 사용자 디렉터리(Users/사용자_이름)
     driver-class-name: org.h2.Driver
     username: ${DB_USER:sa} # 해당 환경변수가 없으면 sa 적용
     password: ${DB_PWD:} # 해당 환경변수가 없으면 빈 문자열 적용
@@ -17,7 +17,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # 개발 환경에 따라 create 또는 create-drop 사용 가능
+      ddl-auto: create # 개발 환경에 따라 create, update 등 변경해서 사용 가능
     show-sql: true
     properties:
       hibernate:
