@@ -21,7 +21,12 @@ public class ProductController {
 
     // 상품 다건 조회
     @Tag(name = "공용")
-    @Operation(summary = "상품 다건 조회")
+    @Operation(
+            summary = "상품 다건 조회",
+            description = """
+                    판매중인 상품을 전부 반환합니다.
+                    """
+    )
     @GetMapping
     public RsData<List<ProductResponse>> getProducts() {
         return new RsData<>(
@@ -34,7 +39,12 @@ public class ProductController {
 
     // [관리자] 상품 추가
     @Tag(name = "관리자")
-    @Operation(summary = "상품 추가")
+    @Operation(
+            summary = "상품 추가",
+            description = """
+                    메뉴에 추가할 상품을 받아 저장합니다.
+                    """
+    )
     @PostMapping("/admin")
     public RsData<ProductResponse> create(@Valid @RequestBody ProductCreateRequest request){
         Product product = productService.create(

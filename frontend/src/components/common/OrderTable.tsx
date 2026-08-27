@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import Link from "next/link";
 import Button from "../ui/Button";
@@ -38,6 +38,10 @@ export default function OrderTable({
         <thead className="table-light">
           <tr>
             <th scope="col" className="text-nowrap">
+              주문 ID
+            </th>
+
+            <th scope="col" className="text-nowrap">
               주문 날짜
             </th>
             {showCustomerEmail && (
@@ -60,13 +64,20 @@ export default function OrderTable({
         </thead>
 
         <tbody>
-          {orders.map((order) => {
+          {orders.map((order, index) => {
             const canManage = showActions(order);
-
+            
+            // 이전 행과 배송일이 다르면 구분선 강조
+            const isDateChanged =
+              index > 0 && orders[index - 1].shippingDate !== order.shippingDate;
+            
             return (
-              <tr key={order.id}>
+              <tr key={order.id} className={isDateChanged ? "row-date-divider" : ""}>
+                
+                <td className="text-nowrap">
+                  {order.id}
+                </td>
 
-                {/* 주문 날짜 */}
                 <td className="text-nowrap">
                   {formatDateTime(order.createDate)}
                 </td>
@@ -100,8 +111,8 @@ export default function OrderTable({
                 {/* 관리 */}
                 <td>
                   {canManage ? (
-                    <div className="d-flex justify-content-end gap-2">
-
+                    <div className="d-flex gap-2">
+                      
                       <Button
                         variant="outline-dark"
                         size="sm"
@@ -116,7 +127,7 @@ export default function OrderTable({
                         onClick={() => onRemove(order.id)}>{removeLabel}</Button>
                     </div>
                   ) : (
-                    <span className="text-body-secondary d-flex justify-content-center gap-2">-</span>
+                    <span className="text-body-secondary">−</span>
                   )}
                 </td>
               </tr>

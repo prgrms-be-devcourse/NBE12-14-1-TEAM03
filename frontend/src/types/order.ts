@@ -62,3 +62,22 @@ export interface RsData<T> {
   msg: string;
   data: T;
 }
+
+export interface MergedItem {
+  productId: number;
+  productName: string;
+  photoUrl: string;
+  quantity: number;
+  totalPrice: number;
+}
+
+export interface MergedShipment {
+  email: string;
+  shippingDate: string;
+  shippingAddress: string;
+  zipCode: string;
+  orderCount: number;
+  mergedOrderIds: number[];
+  totalPrice: number;
+  orderItemList: MergedItem[];
+}

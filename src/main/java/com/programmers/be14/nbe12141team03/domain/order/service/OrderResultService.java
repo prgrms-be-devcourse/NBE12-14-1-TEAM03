@@ -36,7 +36,7 @@ public class OrderResultService {
     @Transactional(readOnly = true)
     public List<OrderResultResponse> getAllList() {
 
-        return this.orderResultRepository.findAll().stream()
+        return this.orderResultRepository.findAll().reversed().stream()
                 .map(OrderResultResponse::new)
                 .toList();
     }
@@ -121,7 +121,7 @@ public class OrderResultService {
     @Transactional(readOnly = true)
     public List<OrderResultResponse> findMyOrders(String email){
 
-        return this.orderResultRepository.findByEmail(email).stream()
+        return this.orderResultRepository.findByEmail(email).reversed().stream()
                 .map(OrderResultResponse::new)
                 .toList();
     }
