@@ -1,14 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import type { ProductResponse } from "@/types/product";
-import type { RsData } from "@/types/order";
+import type {
+    OrderCreateRequest,
+    OrderCreateResponse,
+    RsData,
+} from "@/types/order";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/formatters";
 import QuantityControl from "@/components/common/QuantityControl";
+import { useRouter } from "next/navigation";
 
 export default function CustomerOrderPage() {
+    const router = useRouter();
+
     const [products, setProducts] = useState<ProductResponse[]>([]);
 
     const [selectedQuantities, setSelectedQuantities] = useState<
@@ -18,6 +26,8 @@ export default function CustomerOrderPage() {
     const [email, setEmail] = useState("");
     const [shippingAddress, setShippingAddress] = useState("");
     const [zipCode, setZipCode] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         async function fetchProducts() {
@@ -74,6 +84,60 @@ export default function CustomerOrderPage() {
         (product) => (selectedQuantities[product.id] ?? 0) > 0
     );
 
+    const totalPrice = selectedProducts.reduce(
+        (sum, product) =>
+            sum + product.price * selectedQuantities[product.id],
+        0
+    );
+
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setErrorMessage("");
+
+        if (selectedProducts.length === 0) {
+            setErrorMessage("주문할 상품을 하나 이상 선택해 주세요.");
+            return;
+        }
+
+        const requestBody: OrderCreateRequest = {
+            email: email.trim(),
+            shippingAddress: shippingAddress.trim(),
+            zipCode: zipCode.trim(),
+            items: selectedProducts.map((product) => ({
+                productId: product.id,
+                quantity: selectedQuantities[product.id],
+            })),
+        };
+
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch("http://localhost:8080/api/orders", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            const result: RsData<OrderCreateResponse> = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.msg);
+            }
+
+            router.push(`/orders/${result.data.orderId}`);
+        } catch (error) {
+            setErrorMessage(
+                error instanceof Error
+                    ? error.message
+                    : "주문 생성 중 오류가 발생했습니다."
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <>
             <PageHeader
@@ -126,7 +190,7 @@ export default function CustomerOrderPage() {
                     </div>
 
                     {/* 오른쪽 주문 요약 */}
-                    <aside className="col-12 col-lg-5 border-start bg-body-tertiary p-4">
+                    <aside className="col-12 col-lg-5 border-start bg-body-secondary p-4">
                         <h2 className="h4 mb-4">주문 Summary</h2>
 
                         {selectedProducts.length === 0 ? (
@@ -164,7 +228,7 @@ export default function CustomerOrderPage() {
                             </div>
                         )}
 
-                        <form className="mt-4">
+                        <form className="mt-4" onSubmit={handleSubmit}>
                             <div className="mb-3">
                                 <label htmlFor="email" className="form-label">
                                     이메일
@@ -216,6 +280,38 @@ export default function CustomerOrderPage() {
                                     pattern="[0-9]{5}"
                                     required
                                 />
+                            </div>
+
+                            <div className="border bg-white p-3 mb-4">
+                                오후 2시 이후 주문은 다음 날 배송을 시작합니다.
+                            </div>
+
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <span>총금액</span>
+
+                                <strong className="fs-5">
+                                    {formatCurrency(totalPrice)}
+                                </strong>
+                            </div>
+
+                            {errorMessage && (
+                                <div className="alert alert-danger" role="alert">
+                                    {errorMessage}
+                                </div>
+                            )}
+
+                            <Button
+                                type="submit"
+                                fullWidth
+                                disabled={isSubmitting || selectedProducts.length === 0}
+                            >
+                                {isSubmitting ? "주문 처리 중..." : "주문하기"}
+                            </Button>
+
+                            <div className="mt-3">
+                                <span className="border bg-white px-3 py-2 font-monospace text-body-secondary">
+                                    POST /api/orders
+                                </span>
                             </div>
                         </form>
                     </aside>
