@@ -38,6 +38,25 @@ export interface ProductResponse {
   photoUrl?: string;
 }
 
+export interface OrderCreateItemRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface OrderCreateRequest {
+  email: string;
+  items: OrderCreateItemRequest[];
+  shippingAddress: string;
+  zipCode: string;
+}
+
+export interface OrderCreateResponse {
+  orderId: number;
+  email: string;
+  totalPrice: number;
+  shippingDate: string;
+}
+
 export interface RsData<T> {
   resultCode: string;
   msg: string;
