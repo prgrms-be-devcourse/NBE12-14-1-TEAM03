@@ -75,6 +75,11 @@ export default function OrderCompletePage() {
     };
   }, [orderId]);
 
+  const handleMoveToMyOrders = () => {
+    sessionStorage.setItem("orderEmail", order.email);
+    router.push("/my-orders");
+  }
+
   return (
     <>
       {/* 1. 페이지 헤더 */}
@@ -176,7 +181,7 @@ export default function OrderCompletePage() {
               </Button>
               <Button
                 variant="dark"
-                onClick={() => router.push("/my-orders")}
+                onClick={handleMoveToMyOrders}
               >
                 주문 내역
               </Button>
