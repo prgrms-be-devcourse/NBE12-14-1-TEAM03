@@ -133,7 +133,7 @@ export default function CustomerOrderPage() {
             }
 
             // 주문 생성에 성공하면 생성된 주문의 완료 페이지로 이동한다.
-            router.push(`/orders/${result.data.orderId}`);
+            router.push(`/orders/${result.data.orderId}?created=1`);
         } catch (error) {
             setErrorMessage(
                 error instanceof Error

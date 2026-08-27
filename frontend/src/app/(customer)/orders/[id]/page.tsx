@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
 import { OrderResultResponse, RsData } from "@/types/order";
 import {
   formatOrderDateTime,
-  formatShippingDate,
-  formatCurrency,
-  formatOrderItemSummary,
 } from "@/lib/formatters";
 import OrderSummaryCard from "@/components/common/OrderSummaryCard";
 
@@ -48,6 +45,10 @@ export default function OrderCompletePage() {
   const [order, setOrder] = useState<OrderResultResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const searchParams = useSearchParams();
+  const isCreated = searchParams.get("created") === "1";
+
+
   useEffect(() => {
     let isMounted = true;
 
@@ -85,15 +86,26 @@ export default function OrderCompletePage() {
   return (
     <>
       {/* 1. 페이지 헤더 */}
-      <PageHeader
-        title="주문 완료"
-        description="생성된 주문 정보를 확인합니다."
-        actions={
-          <div className="border bg-white px-3 py-1 font-monospace text-body-secondary">
-            GET /orders/&#123;id&#125;
-          </div>
-        }
-      />
+      {isCreated
+        ? <PageHeader
+          title="주문 완료"
+          description="생성된 주문 정보를 확인합니다."
+          actions={
+            <div className="border bg-white px-3 py-1 font-monospace text-body-secondary">
+              GET /orders/&#123;id&#125;
+            </div>
+          }
+        />
+        : <PageHeader
+          title="주문 상세"
+          description="주문 정보를 확인합니다."
+          actions={
+            <div className="border bg-white px-3 py-1 font-monospace text-body-secondary">
+              GET /orders/&#123;id&#125;
+            </div>
+          }
+        />}
+
 
       {/* 2. 주문 완료 상세 카드 */}
       <section className="border bg-white p-4 p-md-5 mb-4">
@@ -108,30 +120,33 @@ export default function OrderCompletePage() {
         ) : (
           <div className="mx-auto" style={{ maxWidth: "680px" }}>
             {/* 상단 체크 아이콘 */}
-            <div
-              className="border border-dark rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-              style={{ width: "52px", height: "52px" }}
-              aria-hidden="true"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {isCreated &&
+              <div
+                className="border border-dark rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: "52px", height: "52px" }}
+                aria-hidden="true"
               >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>}
+
 
             {/* 타이틀 및 주문 일시 */}
-            <h2 className="h4 fw-semibold text-center mb-2">
-              주문이 완료되었습니다
-            </h2>
+            {isCreated &&
+              <h2 className="h4 fw-semibold text-center mb-2">
+                주문이 완료되었습니다
+              </h2>}
             <p className="text-center text-body-secondary mb-4">
               {formatOrderDateTime(order.createDate)}
             </p>

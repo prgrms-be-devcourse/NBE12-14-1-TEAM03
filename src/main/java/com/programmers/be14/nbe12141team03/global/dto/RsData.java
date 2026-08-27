@@ -13,8 +13,8 @@ public class RsData<T> {
 
     public RsData(String resultCode, String msg) {
         this.resultCode = resultCode;
-        this.msg = msg;
         this.data = null;
+        this.msg = msg;
     }
 
 

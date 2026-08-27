@@ -1,5 +1,6 @@
 'use client'
 
+import Link from "next/link";
 import Button from "../ui/Button";
 import { useRouter } from "next/navigation";
 import { OrderItemResponse, OrderResultResponse } from "@/types/order";
@@ -64,30 +65,43 @@ export default function OrderTable({
 
             return (
               <tr key={order.id}>
+
+                {/* 주문 날짜 */}
                 <td className="text-nowrap">
                   {formatDateTime(order.createDate)}
                 </td>
 
+                {/* 이메일 */}
                 {showCustomerEmail && (
                   <td className="text-nowrap">
                     {order.email}
                   </td>
                 )}
 
-                <td>{formatProductSummary(order.orderItemList)}</td>
+                {/* 상품 */}
+                <td>
+                  <Link 
+                    href={`/orders/${order.id}`}
+                    className="text-dark">
+                    {formatProductSummary(order.orderItemList)}
+                  </Link>
+                </td>
 
+                {/* 총 금액 */}
                 <td className="text-end text-nowrap">
                   {formatPrice(order.totalPrice)}
                 </td>
 
+                {/* 배송 예정일 */}
                 <td className="text-nowrap">
                   {formatShippingDate(order.shippingDate)}
                 </td>
 
+                {/* 관리 */}
                 <td>
                   {canManage ? (
                     <div className="d-flex justify-content-end gap-2">
-                      
+
                       <Button
                         variant="outline-dark"
                         size="sm"
@@ -96,8 +110,8 @@ export default function OrderTable({
                         수정
                       </Button>
 
-                      <Button 
-                        variant="outline-dark" 
+                      <Button
+                        variant="outline-dark"
                         size="sm"
                         onClick={() => onRemove(order.id)}>{removeLabel}</Button>
                     </div>
