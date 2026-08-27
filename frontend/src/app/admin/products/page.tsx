@@ -63,12 +63,22 @@ export default function AdminProductsPage() {
                     {products.map((product) => (
                         <tr key={product.id}>
                             <td>
-                                <div
-                                    className="border d-flex align-items-center justify-content-center text-body-secondary"
-                                    style={{ width: "64px", height: "64px" }}
-                                >
-                                    IMAGE
-                                </div>
+                                {product.photoUrl ? (
+                                    <img
+                                        src={`http://localhost:8080${product.photoUrl}`}
+                                        alt={`${product.name} 상품 이미지`}
+                                        width="64"
+                                        height="64"
+                                        style={{ objectFit: "cover" }}
+                                    />
+                                ) : (
+                                    <div
+                                        className="border d-flex align-items-center justify-content-center text-body-secondary"
+                                        style={{ width: "64px", height: "64px" }}
+                                    >
+                                        IMAGE
+                                    </div>
+                                )}
                             </td>
 
                             <td>{product.name}</td>
