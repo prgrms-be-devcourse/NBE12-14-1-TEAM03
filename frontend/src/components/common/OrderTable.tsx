@@ -7,6 +7,7 @@ import { OrderItemResponse, OrderResultResponse } from "@/types/order";
 
 export interface OrderTableProps {
   orders: OrderResultResponse[];
+  detailPath?: (orderId: number) => string;
   editPath: (orderId: number) => string;
   removeLabel?: "취소" | "삭제";
   onRemove: (orderId: number) => void;
@@ -16,6 +17,7 @@ export interface OrderTableProps {
 
 export default function OrderTable({
   orders,
+  detailPath = (orderId) => `/orders/${orderId}`,
   editPath,
   removeLabel = "취소",
   onRemove,
@@ -92,7 +94,7 @@ export default function OrderTable({
                 {/* 상품 */}
                 <td>
                   <Link 
-                    href={`/orders/${order.id}`}
+                    href={detailPath(order.id)}
                     className="text-dark">
                     {formatProductSummary(order.orderItemList)}
                   </Link>
