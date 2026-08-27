@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
-import { OrderResultResponse, RsData } from "@/types/order";
+import ErrorDisplay from "@/components/common/ErrorDisplay";
+import { OrderResultResponse } from "@/types/order";
+import { api, ApiError } from "@/lib/api";
 import {
   formatOrderDateTime,
   formatShippingDate,
@@ -12,55 +14,42 @@ import {
   formatOrderItemSummary,
 } from "@/lib/formatters";
 
-// 와이어프레임 기본 목데이터 (백엔드 미구동 또는 조회 실패 시 표시)
-const DEFAULT_ORDER_DATA: OrderResultResponse = {
-  id: 1,
-  createDate: "2026-08-26T13:42:00",
-  email: "suji@example.com",
-  shippingAddress: "서울시 강남구 테헤란로 00",
-  zipCode: "06236",
-  shippingDate: "2026-08-26",
-  totalPrice: 16500,
-  orderItemList: [
-    {
-      productId: 1,
-      productName: "Columbia Nariño",
-      orderPrice: 5000,
-      quantity: 2,
-      totalPrice: 10000,
-    },
-    {
-      productId: 2,
-      productName: "Brazil Serra",
-      orderPrice: 6500,
-      quantity: 1,
-      totalPrice: 6500,
-    },
-  ],
-};
-
 export default function OrderCompletePage() {
   const params = useParams();
   const orderId = params?.id as string | undefined;
   const router = useRouter();
 
-  const [order, setOrder] = useState<OrderResultResponse>(DEFAULT_ORDER_DATA);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [order, setOrder] = useState<OrderResultResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<{
+    statusCode: number;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchOrder() {
+      if (!orderId) return;
+
       try {
-        const response = await fetch(`/api/orders/mypage/${orderId}`);
-        if (response.ok) {
-          const resData: RsData<OrderResultResponse> = await response.json();
-          if (resData && resData.data && isMounted) {
-            setOrder(resData.data);
+        setLoading(true);
+        setFetchError(null);
+        const resData = await api<OrderResultResponse>(`/api/orders/mypage/${orderId}`);
+        if (isMounted) {
+          setOrder(resData.data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          if (err instanceof ApiError) {
+            setFetchError({ statusCode: err.statusCode, message: err.message });
+          } else {
+            setFetchError({
+              statusCode: 500,
+              message: "주문 정보를 불러오지 못했습니다.",
+            });
           }
         }
-      } catch {
-        // 백엔드 연결 전이거나 에러 발생 시 기본 목데이터 유지
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -76,8 +65,19 @@ export default function OrderCompletePage() {
   }, [orderId]);
 
   const handleMoveToMyOrders = () => {
-    sessionStorage.setItem("orderEmail", order.email);
+    if (order) {
+      sessionStorage.setItem("orderEmail", order.email);
+    }
     router.push("/my-orders");
+  };
+
+  if (fetchError) {
+    return (
+      <ErrorDisplay
+        statusCode={fetchError.statusCode}
+        message={fetchError.message}
+      />
+    );
   }
 
   return (
@@ -99,7 +99,7 @@ export default function OrderCompletePage() {
           <div className="text-center py-5 text-body-secondary">
             주문 정보를 불러오는 중입니다...
           </div>
-        ) : (
+        ) : order ? (
           <div className="mx-auto" style={{ maxWidth: "680px" }}>
             {/* 상단 체크 아이콘 */}
             <div
@@ -187,7 +187,7 @@ export default function OrderCompletePage() {
               </Button>
             </div>
           </div>
-        )}
+        ) : null}
       </section>
     </>
   );
