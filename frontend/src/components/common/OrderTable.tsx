@@ -63,11 +63,15 @@ export default function OrderTable({
         </thead>
 
         <tbody>
-          {orders.map((order) => {
+          {orders.map((order, index) => {
             const canManage = showActions(order);
-
+            
+            // 이전 행과 배송일이 다르면 구분선 강조
+            const isDateChanged =
+              index > 0 && orders[index - 1].shippingDate !== order.shippingDate;
+            
             return (
-              <tr key={order.id}>
+              <tr key={order.id} className={isDateChanged ? "row-date-divider" : ""}>
                 
                 <td className="text-nowrap">
                   {order.id}
