@@ -11,6 +11,7 @@ export default function MyOrdersPage() {
     const [orderList, setOrderList] = useState<OrderResultResponse[]>([]);
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState("");
+    const [searchedEmail, setSearchedEmail] = useState("");
 
     const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -45,6 +46,7 @@ export default function MyOrdersPage() {
             }
 
             setOrderList(data.data ?? []);
+            setSearchedEmail(trimmed);
         } catch {
             alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.")
         }
@@ -116,7 +118,7 @@ export default function MyOrdersPage() {
                     )}
                 </div>
             </form>
-            <h2 className="h6 mb-4">{email}의 주문 내역</h2>
+            {orderList.length > 0 && (<h2 className="h6 mb-4">{searchedEmail}의 주문 내역</h2>)}
             <OrderTable
                 orders={orderList}
                 editPath={(orderId) => `/orders/${orderId}/edit`}
