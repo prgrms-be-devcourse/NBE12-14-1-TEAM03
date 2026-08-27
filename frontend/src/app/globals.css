@@ -3,7 +3,6 @@
   --app-surface: #ffffff;
   --app-product-image-size: 64px;
 }
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -14,4 +13,8 @@ body {
   width: var(--app-product-image-size);
   height: var(--app-product-image-size);
   object-fit: cover;
+}
+
+.row-date-divider > td {
+  border-top: 4px solid #c8c8c0;
 }
