@@ -1,35 +1,15 @@
-'use client'
+'use client';
 
 import Button from "../ui/Button";
 import { useRouter } from "next/navigation";
-
-export interface OrderItem {
-  productId: number;
-  productName: string;
-  photoUrl: string;
-  orderPrice: number;
-  quantity: number;
-  totalPrice: number
-}
-
-export interface Order {
-  id: number;
-  createDate: string;
-  modifyDate: string;
-  email: string;
-  shippingAddress: string;
-  zipCode: string;
-  totalPrice: number;
-  shippingDate: string;
-  orderItemList: OrderItem[];
-};
+import { OrderItemResponse, OrderResultResponse } from "@/types/order";
 
 export interface OrderTableProps {
-  orders: Order[];
+  orders: OrderResultResponse[];
   editPath: (orderId: number) => string;
   removeLabel?: "취소" | "삭제";
   onRemove: (orderId: number) => void;
-  showActions?: (order: Order) => boolean;
+  showActions?: (order: OrderResultResponse) => boolean;
   showCustomerEmail?: boolean;
 };
 
@@ -56,6 +36,10 @@ export default function OrderTable({
       <table className="table align-middle mb-0">
         <thead className="table-light">
           <tr>
+            <th scope="col" className="text-nowrap">
+              주문 ID
+            </th>
+
             <th scope="col" className="text-nowrap">
               주문 날짜
             </th>
@@ -84,6 +68,11 @@ export default function OrderTable({
 
             return (
               <tr key={order.id}>
+                
+                <td className="text-nowrap">
+                  {order.id}
+                </td>
+
                 <td className="text-nowrap">
                   {formatDateTime(order.createDate)}
                 </td>
@@ -106,7 +95,7 @@ export default function OrderTable({
 
                 <td>
                   {canManage ? (
-                    <div className="d-flex justify-content-end gap-2">
+                    <div className="d-flex gap-2">
                       
                       <Button
                         variant="outline-dark"
@@ -122,7 +111,7 @@ export default function OrderTable({
                         onClick={() => onRemove(order.id)}>{removeLabel}</Button>
                     </div>
                   ) : (
-                    <span className="text-body-secondary d-flex justify-content-center gap-2">-</span>
+                    <span className="text-body-secondary">−</span>
                   )}
                 </td>
               </tr>
@@ -134,7 +123,7 @@ export default function OrderTable({
   );
 }
 
-function formatProductSummary(orderItems: OrderItem[]): string {
+function formatProductSummary(orderItems: OrderItemResponse[]): string {
   if (orderItems.length === 0) {
     return "상품 없음";
   }

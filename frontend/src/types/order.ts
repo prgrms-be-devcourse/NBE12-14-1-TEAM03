@@ -38,8 +38,46 @@ export interface ProductResponse {
   photoUrl?: string;
 }
 
+export interface OrderCreateItemRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface OrderCreateRequest {
+  email: string;
+  items: OrderCreateItemRequest[];
+  shippingAddress: string;
+  zipCode: string;
+}
+
+export interface OrderCreateResponse {
+  orderId: number;
+  email: string;
+  totalPrice: number;
+  shippingDate: string;
+}
+
 export interface RsData<T> {
   resultCode: string;
   msg: string;
   data: T;
+}
+
+export interface MergedItem {
+  productId: number;
+  productName: string;
+  photoUrl: string;
+  quantity: number;
+  totalPrice: number;
+}
+
+export interface MergedShipment {
+  email: string;
+  shippingDate: string;
+  shippingAddress: string;
+  zipCode: string;
+  orderCount: number;
+  mergedOrderIds: number[];
+  totalPrice: number;
+  orderItemList: MergedItem[];
 }
