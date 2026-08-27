@@ -155,18 +155,21 @@ export default function OrderCompletePage() {
 
             {/* 하단 네비게이션 버튼 */}
             <div className="d-flex justify-content-center gap-2">
+            {isCreated &&
               <Button
                 variant="outline-dark"
                 onClick={() => router.push("/orders")}
               >
                 상품 더 보기
-              </Button>
-              <Button
-                variant="dark"
-                onClick={handleMoveToMyOrders}
-              >
-                주문 내역
-              </Button>
+              </Button>}
+              
+                <Button
+                  variant="dark"
+                  onClick={handleMoveToMyOrders}
+                >
+                  {isCreated ? "주문 내역" : "목록"}
+                </Button>
+
             </div>
           </div>
         )}
