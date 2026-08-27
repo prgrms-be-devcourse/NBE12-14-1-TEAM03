@@ -40,6 +40,7 @@ const DEFAULT_ORDER_DATA: OrderResultResponse = {
       totalPrice: 6000,
     },
   ],
+  modifiable: false
 };
 
 // 와이어프레임 기본 상품 목록 목데이터
@@ -230,7 +231,7 @@ export default function OrderEditPage() {
         });
 
         if (res.ok) {
-          router.push(`/orders/${orderId}`);
+          router.push(`/orders/${orderId}`); //TODO: 목록으로 이동(관리자, 사용자 분기 처리)
           return;
         } else {
           const errData = await res.json().catch(() => null);

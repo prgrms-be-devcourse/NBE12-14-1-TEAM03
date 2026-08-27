@@ -35,6 +35,7 @@ const DEFAULT_ORDER_DATA: OrderResultResponse = {
       totalPrice: 6500,
     },
   ],
+  modifiable: false
 };
 
 export default function OrderCompletePage() {

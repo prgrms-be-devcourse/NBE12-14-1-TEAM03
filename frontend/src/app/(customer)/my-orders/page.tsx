@@ -103,7 +103,7 @@ export default function MyOrdersPage() {
     }
 
     const isEditable = (order: OrderResultResponse) => {
-        return getTodayString() <= order.shippingDate;
+        return order.modifiable
     }
 
     return (
