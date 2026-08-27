@@ -35,4 +35,13 @@ public class SpringDoc {
                 .pathsToMatch("/api/products", "/api/products/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi imageApi() {
+        return GroupedOpenApi.builder()
+                .group("이미지")
+                .pathsToMatch("/api/images", "/api/images/**")
+                .build();
+    }
 }
+
