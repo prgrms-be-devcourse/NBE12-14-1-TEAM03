@@ -73,4 +73,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(rsData.getStatusCode()).body(rsData);
     }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<RsData<Void>> handleMaxUploadSizeExceededException(
+            org.springframework.web.multipart.MaxUploadSizeExceededException e
+    ) {
+        RsData<Void> rsData = new RsData<>(
+                "400-1",
+                "업로드 가능한 최대 파일 크기(10MB)를 초과했습니다."
+        );
+
+        return ResponseEntity.status(rsData.getStatusCode()).body(rsData);
+    }
 }
+
