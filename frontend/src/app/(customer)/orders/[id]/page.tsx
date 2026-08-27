@@ -11,6 +11,7 @@ import {
   formatCurrency,
   formatOrderItemSummary,
 } from "@/lib/formatters";
+import OrderSummaryCard from "@/components/common/OrderSummaryCard";
 
 // 와이어프레임 기본 목데이터 (백엔드 미구동 또는 조회 실패 시 표시)
 const DEFAULT_ORDER_DATA: OrderResultResponse = {
@@ -44,8 +45,8 @@ export default function OrderCompletePage() {
   const orderId = params?.id as string | undefined;
   const router = useRouter();
 
-  const [order, setOrder] = useState<OrderResultResponse>(DEFAULT_ORDER_DATA);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [order, setOrder] = useState<OrderResultResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -76,6 +77,7 @@ export default function OrderCompletePage() {
   }, [orderId]);
 
   const handleMoveToMyOrders = () => {
+    if (!order) return;
     sessionStorage.setItem("orderEmail", order.email);
     router.push("/my-orders");
   }
@@ -98,6 +100,10 @@ export default function OrderCompletePage() {
         {loading ? (
           <div className="text-center py-5 text-body-secondary">
             주문 정보를 불러오는 중입니다...
+          </div>
+        ) : !order ? (
+          <div className="text-center py-5 text-body-secondary">
+            주문 정보를 불러오지 못했습니다.
           </div>
         ) : (
           <div className="mx-auto" style={{ maxWidth: "680px" }}>
@@ -130,46 +136,7 @@ export default function OrderCompletePage() {
               {formatOrderDateTime(order.createDate)}
             </p>
 
-            {/* 상세 정보 테이블/목록 */}
-            <div className="border-top mb-4">
-              <div className="row py-3 border-bottom gx-3 gy-1 align-items-center">
-                <div className="col-12 col-sm-3 text-body-secondary">상품</div>
-                <div className="col-12 col-sm-9">
-                  {formatOrderItemSummary(order.orderItemList)}
-                </div>
-              </div>
-
-              <div className="row py-3 border-bottom gx-3 gy-1 align-items-center">
-                <div className="col-12 col-sm-3 text-body-secondary">이메일</div>
-                <div className="col-12 col-sm-9">{order.email}</div>
-              </div>
-
-              <div className="row py-3 border-bottom gx-3 gy-1 align-items-center">
-                <div className="col-12 col-sm-3 text-body-secondary">주소</div>
-                <div className="col-12 col-sm-9">{order.shippingAddress}</div>
-              </div>
-
-              <div className="row py-3 border-bottom gx-3 gy-1 align-items-center">
-                <div className="col-12 col-sm-3 text-body-secondary">우편번호</div>
-                <div className="col-12 col-sm-9">{order.zipCode}</div>
-              </div>
-
-              <div className="row py-3 border-bottom gx-3 gy-1 align-items-center">
-                <div className="col-12 col-sm-3 text-body-secondary">
-                  배송 예정일
-                </div>
-                <div className="col-12 col-sm-9">
-                  {formatShippingDate(order.shippingDate)}
-                </div>
-              </div>
-
-              <div className="row py-3 border-bottom gx-3 gy-1 align-items-center">
-                <div className="col-12 col-sm-3 text-body-secondary">총금액</div>
-                <div className="col-12 col-sm-9">
-                  {formatCurrency(order.totalPrice)}
-                </div>
-              </div>
-            </div>
+            <OrderSummaryCard order={order} />
 
             {/* 하단 네비게이션 버튼 */}
             <div className="d-flex justify-content-center gap-2">
