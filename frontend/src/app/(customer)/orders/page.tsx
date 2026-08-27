@@ -5,8 +5,7 @@ import type { FormEvent } from "react";
 import type { ProductResponse } from "@/types/product";
 import type {
     OrderCreateRequest,
-    OrderCreateResponse,
-    RsData,
+    OrderCreateResponse
 } from "@/types/order";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
