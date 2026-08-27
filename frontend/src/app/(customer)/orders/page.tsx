@@ -13,28 +13,31 @@ import Button from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/formatters";
 import QuantityControl from "@/components/common/QuantityControl";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function CustomerOrderPage() {
     const router = useRouter();
 
+    // 서버에서 조회한 전체 상품 목록
     const [products, setProducts] = useState<ProductResponse[]>([]);
 
+    // 상품 ID를 key로 사용해 주문할 수량을 관리
     const [selectedQuantities, setSelectedQuantities] = useState<
         Record<number, number>
     >({});
 
+    // 주문자 및 배송 정보
     const [email, setEmail] = useState("");
     const [shippingAddress, setShippingAddress] = useState("");
     const [zipCode, setZipCode] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
+    // 페이지가 처음 열릴 때 판매 상품 목록을 조회
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const response = await fetch(
-                    "http://localhost:8080/api/products"
-                );
+                const response = await fetch("/api/products");
 
                 if (!response.ok) {
                     throw new Error("상품 목록을 불러오지 못했습니다.");
@@ -52,6 +55,7 @@ export default function CustomerOrderPage() {
         fetchProducts();
     }, []);
 
+    // 상품 추가하면 기존 수량 1
     const handleAddProduct = (productId: number) => {
         setSelectedQuantities((currentQuantities) => ({
             ...currentQuantities,
@@ -79,11 +83,12 @@ export default function CustomerOrderPage() {
         });
     };
 
-
+    // 수량이 1개 이상인 상품만 표시
     const selectedProducts = products.filter(
         (product) => (selectedQuantities[product.id] ?? 0) > 0
     );
 
+    // 총금액 계산
     const totalPrice = selectedProducts.reduce(
         (sum, product) =>
             sum + product.price * selectedQuantities[product.id],
@@ -99,6 +104,7 @@ export default function CustomerOrderPage() {
             return;
         }
 
+        // 입력값 api요청
         const requestBody: OrderCreateRequest = {
             email: email.trim(),
             shippingAddress: shippingAddress.trim(),
@@ -112,7 +118,7 @@ export default function CustomerOrderPage() {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch("http://localhost:8080/api/orders", {
+            const response = await fetch("/api/orders", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -126,6 +132,7 @@ export default function CustomerOrderPage() {
                 throw new Error(result.msg);
             }
 
+            // 주문 생성에 성공하면 생성된 주문의 완료 페이지로 이동한다.
             router.push(`/orders/${result.data.orderId}`);
         } catch (error) {
             setErrorMessage(
@@ -159,10 +166,14 @@ export default function CustomerOrderPage() {
                                 key={product.id}
                                 className="d-flex gap-3 py-4 border-bottom"
                             >
-                                {/* 상품 이미지 임시 영역 */}
-                                <div className="border d-flex align-items-center justify-content-center flex-shrink-0 p-3 text-body-secondary">
-                                    IMAGE
-                                </div>
+                                {/* 상품 이미지 */}
+                                <Image
+                                    src={product.photoUrl}
+                                    alt={product.name}
+                                    width={64}
+                                    height={64}
+                                    className="border object-fit-cover flex-shrink-0"
+                                />
 
                                 {/* 상품 정보 */}
                                 <div className="flex-grow-1">
@@ -228,6 +239,7 @@ export default function CustomerOrderPage() {
                             </div>
                         )}
 
+                        {/* 주문자 및 배송 정보 입력 */}
                         <form className="mt-4" onSubmit={handleSubmit}>
                             <div className="mb-3">
                                 <label htmlFor="email" className="form-label">
