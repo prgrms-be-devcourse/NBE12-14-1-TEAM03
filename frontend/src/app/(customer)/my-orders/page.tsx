@@ -1,10 +1,10 @@
 'use client'
 
 import OrderTable from "@/components/common/OrderTable";
-import { RsData, OrderResultResponse, OrderItemResponse } from "@/types/order";
+import { RsData, OrderResultResponse } from "@/types/order";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
-import { useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 
 export default function MyOrdersPage() {
 
@@ -15,23 +15,12 @@ export default function MyOrdersPage() {
 
     const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const handleSearchOrders = async (event: SubmitEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setEmailError("");
-
-        const trimmed = email.trim();
-        if (!trimmed) {
-            setEmailError("이메일을 입력해 주세요.");
-            return;
-        }
-        if (!EMAIL_PATTERN.test(trimmed)) {
-            setEmailError("올바른 이메일 형식이 아닙니다.");
-            return;
-        }
-
+    const fetchOrdersByEmail = async (targetEmail: string) => {
         try {
+            setEmailError("");
+
             const res = await fetch(
-                `http://localhost:8080/api/orders/mypage?email=${encodeURIComponent(email)}`
+                `/api/orders/mypage?email=${encodeURIComponent(targetEmail)}`
             );
 
             const data: RsData<OrderResultResponse[]> = await res.json();
@@ -39,17 +28,53 @@ export default function MyOrdersPage() {
             if (!res.ok || !data.resultCode.startsWith("200")) {
                 if (res.status === 400) {
                     setEmailError(data.msg ?? "이메일을 확인해 주세요.");
+                    setOrderList([]);
                     return;
                 }
+
                 alert(data.msg ?? "주문 내역 조회에 실패했습니다.")
                 return;
             }
 
             setOrderList(data.data ?? []);
-            setSearchedEmail(trimmed);
+            setSearchedEmail(targetEmail);
         } catch {
             alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.")
         }
+    };
+
+    useEffect(() => {
+        const savedEmail = sessionStorage.getItem("orderEmail");
+
+        if (!savedEmail) {
+            return;
+        }
+
+        setEmail(savedEmail);
+        void fetchOrdersByEmail(savedEmail);
+    }, [])
+
+    const handleSearchOrders = async (
+        event: SubmitEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
+
+        const trimmedEmail = email.trim();
+
+        if (!trimmedEmail) {
+            setEmailError("이메일을 입력해 주세요.")
+            return;
+        }
+
+        if(!EMAIL_PATTERN.test(trimmedEmail)){
+            setEmailError("올바른 이메일 형식을 입력해 주세요.");
+            return;
+        }
+
+        setEmailError("");
+        sessionStorage.setItem("orderEmail", trimmedEmail);
+
+        await fetchOrdersByEmail(trimmedEmail);
     }
 
     const handleCancelOrder = async (orderId: number) => {
@@ -58,7 +83,7 @@ export default function MyOrdersPage() {
         }
 
         try {
-            const res = await fetch(`http://localhost:8080/api/orders/${orderId}`, { method: "DELETE" });
+            const res = await fetch(`/api/orders/${orderId}`, { method: "DELETE" });
 
 
             const data: RsData<null> = await res.json();
