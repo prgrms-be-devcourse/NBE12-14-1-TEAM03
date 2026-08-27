@@ -2,34 +2,14 @@
 
 import Button from "../ui/Button";
 import { useRouter } from "next/navigation";
-
-export interface OrderItem {
-  productId: number;
-  productName: string;
-  photoUrl: string;
-  orderPrice: number;
-  quantity: number;
-  totalPrice: number
-}
-
-export interface Order {
-  id: number;
-  createDate: string;
-  modifyDate: string;
-  email: string;
-  shippingAddress: string;
-  zipCode: string;
-  totalPrice: number;
-  shippingDate: string;
-  orderItemList: OrderItem[];
-};
+import { OrderItemResponse, OrderResultResponse } from "@/types/order";
 
 export interface OrderTableProps {
-  orders: Order[];
+  orders: OrderResultResponse[];
   editPath: (orderId: number) => string;
   removeLabel?: "취소" | "삭제";
   onRemove: (orderId: number) => void;
-  showActions?: (order: Order) => boolean;
+  showActions?: (order: OrderResultResponse) => boolean;
   showCustomerEmail?: boolean;
 };
 
@@ -134,7 +114,7 @@ export default function OrderTable({
   );
 }
 
-function formatProductSummary(orderItems: OrderItem[]): string {
+function formatProductSummary(orderItems: OrderItemResponse[]): string {
   if (orderItems.length === 0) {
     return "상품 없음";
   }
