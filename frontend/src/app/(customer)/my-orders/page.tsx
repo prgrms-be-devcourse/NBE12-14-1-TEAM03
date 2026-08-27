@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import OrderTable from "@/components/common/OrderTable";
 
