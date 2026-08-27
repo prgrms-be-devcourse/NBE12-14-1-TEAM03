@@ -167,13 +167,17 @@ export default function CustomerOrderPage() {
                                 className="d-flex gap-3 py-4 border-bottom"
                             >
                                 {/* 상품 이미지 */}
-                                <Image
-                                    src={product.photoUrl}
-                                    alt={product.name}
-                                    width={64}
-                                    height={64}
-                                    className="border object-fit-cover flex-shrink-0"
-                                />
+                                {product.photoUrl ? (
+                                    <Image
+                                        src={product.photoUrl}
+                                        alt={product.name}
+                                        width={64}
+                                        height={64}
+                                        className="border product-image flex-shrink-0"
+                                    />
+                                ) : (
+                                    <div className="border bg-body-secondary product-image flex-shrink-0" />
+                                )}
 
                                 {/* 상품 정보 */}
                                 <div className="flex-grow-1">
