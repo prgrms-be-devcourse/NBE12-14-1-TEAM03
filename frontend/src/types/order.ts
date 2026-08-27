@@ -19,6 +19,25 @@ export interface OrderResultResponse {
   orderItemList: OrderItemResponse[];
 }
 
+export interface OrderModifyItemRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface OrderModifyRequest {
+  shippingAddress: string;
+  zipCode: string;
+  orderItemList: OrderModifyItemRequest[];
+}
+
+export interface ProductResponse {
+  id: number;
+  name: string;
+  category?: string;
+  price: number;
+  photoUrl?: string;
+}
+
 export interface RsData<T> {
   resultCode: string;
   msg: string;
