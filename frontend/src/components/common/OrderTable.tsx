@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link";
 import Button from "../ui/Button";
 import { useRouter } from "next/navigation";
 import { OrderItemResponse, OrderResultResponse } from "@/types/order";
@@ -63,11 +64,15 @@ export default function OrderTable({
         </thead>
 
         <tbody>
-          {orders.map((order) => {
+          {orders.map((order, index) => {
             const canManage = showActions(order);
-
+            
+            // 이전 행과 배송일이 다르면 구분선 강조
+            const isDateChanged =
+              index > 0 && orders[index - 1].shippingDate !== order.shippingDate;
+            
             return (
-              <tr key={order.id}>
+              <tr key={order.id} className={isDateChanged ? "row-date-divider" : ""}>
                 
                 <td className="text-nowrap">
                   {order.id}
@@ -77,22 +82,33 @@ export default function OrderTable({
                   {formatDateTime(order.createDate)}
                 </td>
 
+                {/* 이메일 */}
                 {showCustomerEmail && (
                   <td className="text-nowrap">
                     {order.email}
                   </td>
                 )}
 
-                <td>{formatProductSummary(order.orderItemList)}</td>
+                {/* 상품 */}
+                <td>
+                  <Link 
+                    href={`/orders/${order.id}`}
+                    className="text-dark">
+                    {formatProductSummary(order.orderItemList)}
+                  </Link>
+                </td>
 
+                {/* 총 금액 */}
                 <td className="text-end text-nowrap">
                   {formatPrice(order.totalPrice)}
                 </td>
 
+                {/* 배송 예정일 */}
                 <td className="text-nowrap">
                   {formatShippingDate(order.shippingDate)}
                 </td>
 
+                {/* 관리 */}
                 <td>
                   {canManage ? (
                     <div className="d-flex gap-2">
@@ -105,8 +121,8 @@ export default function OrderTable({
                         수정
                       </Button>
 
-                      <Button 
-                        variant="outline-dark" 
+                      <Button
+                        variant="outline-dark"
                         size="sm"
                         onClick={() => onRemove(order.id)}>{removeLabel}</Button>
                     </div>

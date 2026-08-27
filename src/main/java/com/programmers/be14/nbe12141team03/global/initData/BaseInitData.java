@@ -6,6 +6,8 @@ import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 import com.programmers.be14.nbe12141team03.domain.order.repository.OrderResultRepository;
 import com.programmers.be14.nbe12141team03.domain.product.entity.Product;
 import com.programmers.be14.nbe12141team03.domain.product.repository.ProductRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -15,6 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +37,7 @@ public class BaseInitData {
         return args -> {
             self.work1();
             self.work2();
+            self.work3();
         };
     }
 
@@ -172,4 +176,24 @@ public class BaseInitData {
         orderResultRepository.saveAll(bulkTomorrow);
     }
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Transactional
+    public void work3() {
+        List<OrderResult> all = orderResultRepository.findAll();
+
+        for (OrderResult o : all) {
+            // 배송일 하루 전, id에 따라 시각 분산
+            LocalDateTime created = o.getShippingDate()
+                    .minusDays(1)
+                    .atTime(9 + (int)(o.getId() % 12), (int)(o.getId() * 7 % 60));
+
+            entityManager.createNativeQuery(
+                            "UPDATE order_result SET create_date = :d WHERE id = :id")
+                    .setParameter("d", created)
+                    .setParameter("id", o.getId())
+                    .executeUpdate();
+        }
+    }
 }

@@ -6,6 +6,7 @@ import type { ProductResponse } from "@/types/product";
 import type {
     OrderCreateRequest,
     OrderCreateResponse,
+    RsData,
 } from "@/types/order";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
@@ -131,7 +132,7 @@ export default function CustomerOrderPage() {
             });
 
             // 주문 생성에 성공하면 생성된 주문의 완료 페이지로 이동한다.
-            router.push(`/orders/${result.data.orderId}`);
+            router.push(`/orders/${result.data.orderId}?created=1`);
         } catch (error) {
             setErrorMessage(
                 error instanceof Error
@@ -180,15 +181,10 @@ export default function CustomerOrderPage() {
                                         alt={product.name}
                                         width={64}
                                         height={64}
-                                        className="border object-fit-cover flex-shrink-0"
+                                        className="border product-image flex-shrink-0"
                                     />
                                 ) : (
-                                    <div
-                                        className="border d-flex align-items-center justify-content-center text-body-secondary flex-shrink-0"
-                                        style={{ width: 64, height: 64 }}
-                                    >
-                                        IMAGE
-                                    </div>
+                                    <div className="border bg-body-secondary product-image flex-shrink-0" />
                                 )}
 
                                 {/* 상품 정보 */}
