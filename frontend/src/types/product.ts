@@ -4,4 +4,6 @@ export interface ProductResponse {
     category: string;
     price: number;
     photoUrl: string | null;
+    createDate: string | null;
+    modifyDate: string | null;
 }

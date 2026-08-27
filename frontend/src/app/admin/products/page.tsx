@@ -13,7 +13,7 @@ export default function AdminProductsPage() {
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const response = await fetch("http://localhost:8080/api/products");
+                const response = await fetch("/api/products");
 
                 if (!response.ok) {
                     throw new Error("상품 목록 조회에 실패했습니다.");
@@ -27,6 +27,14 @@ export default function AdminProductsPage() {
         }
         fetchProducts();
     }, []);
+
+    function formatDateTime(dateTime: string | null) {
+        if (!dateTime) {
+            return "-";
+        }
+
+        return dateTime.replace("T", " ").slice(0, 16);
+    }
 
     return (
         <>
@@ -47,7 +55,7 @@ export default function AdminProductsPage() {
                         <th scope="col">상품 이미지</th>
                         <th scope="col">상품명</th>
                         <th scope="col">카테고리</th>
-                        <th scope="col" className="text-end text-nowrap">
+                        <th scope="col" className="text-start text-nowrap">
                             가격
                         </th>
                         <th scope="col" className="text-nowrap">
@@ -65,7 +73,7 @@ export default function AdminProductsPage() {
                             <td>
                                 {product.photoUrl ? (
                                     <img
-                                        src={`http://localhost:8080${product.photoUrl}`}
+                                        src={product.photoUrl}
                                         alt={`${product.name} 상품 이미지`}
                                         width="64"
                                         height="64"
@@ -80,20 +88,21 @@ export default function AdminProductsPage() {
                                     </div>
                                 )}
                             </td>
-
                             <td>{product.name}</td>
-
                             <td>{product.category}</td>
-
-                            <td className="text-end text-nowrap">
+                            <td className="text-start text-nowrap">
                                 {product.price.toLocaleString("ko-KR")}원
                             </td>
-
-                            <td className="text-nowrap">-</td>
-                            <td className="text-nowrap">-</td>
+                            <td className="text-nowrap">
+                                {formatDateTime(product.createDate)}
+                            </td>
+                            <td className="text-nowrap">
+                                {formatDateTime(product.modifyDate)}
+                            </td>
                         </tr>
                     ))}
                     </tbody>
+
                 </table>
             </div>
         </>
