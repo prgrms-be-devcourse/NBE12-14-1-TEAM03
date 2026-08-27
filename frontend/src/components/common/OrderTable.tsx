@@ -37,6 +37,10 @@ export default function OrderTable({
         <thead className="table-light">
           <tr>
             <th scope="col" className="text-nowrap">
+              주문 ID
+            </th>
+
+            <th scope="col" className="text-nowrap">
               주문 날짜
             </th>
             {showCustomerEmail && (
@@ -64,6 +68,11 @@ export default function OrderTable({
 
             return (
               <tr key={order.id}>
+                
+                <td className="text-nowrap">
+                  {order.id}
+                </td>
+
                 <td className="text-nowrap">
                   {formatDateTime(order.createDate)}
                 </td>
