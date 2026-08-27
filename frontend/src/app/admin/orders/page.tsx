@@ -1,10 +1,10 @@
 'use client';
 
-import OrderTable, { Order } from "@/components/common/OrderTable";
+import OrderTable from "@/components/common/OrderTable";
 import PageHeader from "@/components/common/PageHeader";
 import ShipmentList from "@/components/common/ShipmentList";
 import Button from "@/components/ui/Button";
-import { MergedShipment } from "@/types/order";
+import { MergedShipment, OrderResultResponse } from "@/types/order";
 
 import { useEffect, useState } from "react";
 
@@ -17,7 +17,7 @@ const todayStr = () => {
 };
 
 export default function AdminOrdersPage(){
-    const [orders, setOrders] = useState<Order[]>([]);
+    const [orders, setOrders] = useState<OrderResultResponse[]>([]);
     const [shipments, setShipments] = useState<MergedShipment[]>([]);
     const [filter, setFilter] = useState<"all" | "today" | "date">("all");
     const [selectedDate, setSelectedDate] = useState(todayStr());
@@ -46,7 +46,7 @@ export default function AdminOrdersPage(){
     }
 
     // 수정 가능 여부 판단
-    const isEditAble = (order: Order) => {
+    const isEditAble = (order: OrderResultResponse) => {
         const deadline = new Date(`${order.shippingDate}T14:00:00`);
         return new Date() < deadline;
     }
@@ -69,11 +69,13 @@ export default function AdminOrdersPage(){
 
     return (
         <>
+        {/* 헤더 */}
         <PageHeader
                 title="관리자 주문 목록"
                 description="조회 기준을 선택해 주문과 합배송 목록을 관리합니다."
             />
 
+        {/* 버튼 */}
         <div className="d-flex flex-wrap gap-2 mb-4">
             <Button
                 variant={filter === "all" ? "dark" : "outline-dark"}
@@ -119,7 +121,7 @@ export default function AdminOrdersPage(){
             </section>
         )}
 
-
+        {/* 내역 테이블 */}
         {filter === "all" ? (
             <OrderTable
                 orders={orders}
