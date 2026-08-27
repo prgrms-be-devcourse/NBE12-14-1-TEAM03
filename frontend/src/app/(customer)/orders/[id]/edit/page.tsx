@@ -26,31 +26,34 @@ const DEFAULT_ORDER_DATA: OrderResultResponse = {
     {
       productId: 1,
       productName: "Columbia Nariño",
+      photoUrl: "/images/columbia-narino.png",
       orderPrice: 5000,
       quantity: 2,
       totalPrice: 10000,
     },
     {
       productId: 2,
-      productName: "Brazil Serra",
-      orderPrice: 6500,
+      productName: "Brazil Serra Do Caparaó",
+      photoUrl: "/images/brazil-serra.png",
+      orderPrice: 6000,
       quantity: 1,
-      totalPrice: 6500,
+      totalPrice: 6000,
     },
   ],
 };
 
 // 와이어프레임 기본 상품 목록 목데이터
 const DEFAULT_PRODUCTS: ProductResponse[] = [
-  { id: 1, name: "Columbia Nariño", price: 5000, category: "커피콩" },
-  { id: 2, name: "Brazil Serra", price: 6500, category: "커피콩" },
-  { id: 3, name: "Ethiopia Sidamo", price: 5500, category: "커피콩" },
-  { id: 4, name: "Columbia Quindío", price: 8000, category: "커피콩" },
+  { id: 1, name: "Columbia Nariñó", price: 5000, category: "커피콩", photoUrl: "/images/columbia-narino.png" },
+  { id: 2, name: "Brazil Serra Do Caparaó", price: 6000, category: "커피콩", photoUrl: "/images/brazil-serra.png" },
+  { id: 3, name: "Ethiopia Sidamo", price: 5500, category: "커피콩", photoUrl: "/images/ethiopia-sidamo.png" },
+  { id: 4, name: "Columbia Quindío", price: 8000, category: "커피콩", photoUrl: "/images/columbia-quindio.png" },
 ];
 
 interface EditableOrderItem {
   productId: number;
   productName: string;
+  photoUrl?: string;
   orderPrice: number;
   quantity: number;
 }
@@ -113,6 +116,7 @@ export default function OrderEditPage() {
                 fetched.orderItemList.map((item) => ({
                   productId: item.productId,
                   productName: item.productName,
+                  photoUrl: item.photoUrl,
                   orderPrice: item.orderPrice,
                   quantity: item.quantity,
                 }))
@@ -168,6 +172,7 @@ export default function OrderEditPage() {
         {
           productId: targetProduct.id,
           productName: targetProduct.name,
+          photoUrl: targetProduct.photoUrl,
           orderPrice: targetProduct.price,
           quantity: 1,
         },
@@ -279,7 +284,29 @@ export default function OrderEditPage() {
               key={item.productId}
               className="d-flex justify-content-between align-items-center gap-3 py-3 border-bottom"
             >
-              <span className="fw-normal">{item.productName}</span>
+              <div className="d-flex align-items-center gap-3">
+                {item.photoUrl ? (
+                  <img
+                    src={item.photoUrl}
+                    alt={`${item.productName} 상품 이미지`}
+                    width={64}
+                    height={64}
+                    className="product-image"
+                  />
+                ) : (
+                  <div
+                    className="bg-body-secondary d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{ width: 64, height: 64 }}
+                    aria-label="이미지 없음"
+                  >
+                    <span className="text-body-secondary" style={{ fontSize: "11px" }}>No Image</span>
+                  </div>
+                )}
+                <div>
+                  <p className="mb-1 fw-semibold">{item.productName}</p>
+                  <p className="mb-0 text-body-secondary">{formatCurrency(item.orderPrice)}</p>
+                </div>
+              </div>
 
               <div className="d-flex align-items-center gap-2">
                 <QuantityControl
@@ -290,7 +317,7 @@ export default function OrderEditPage() {
                   }
                 />
                 <Button
-                  variant="outline-dark"
+                  variant="outline-danger"
                   onClick={() => handleRemoveItem(item.productId)}
                 >
                   삭제
