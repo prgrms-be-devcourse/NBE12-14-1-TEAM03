@@ -1,3 +1,5 @@
+'use client';
+
 import { MergedShipment } from "@/types/order";
 import ShipmentCard from "./ShipmentCard";
 

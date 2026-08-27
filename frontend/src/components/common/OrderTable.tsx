@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import Button from "../ui/Button";
 import { useRouter } from "next/navigation";
@@ -106,7 +106,7 @@ export default function OrderTable({
 
                 <td>
                   {canManage ? (
-                    <div className="d-flex justify-content-end gap-2">
+                    <div className="d-flex gap-2">
                       
                       <Button
                         variant="outline-dark"
@@ -122,7 +122,7 @@ export default function OrderTable({
                         onClick={() => onRemove(order.id)}>{removeLabel}</Button>
                     </div>
                   ) : (
-                    <span className="text-body-secondary d-flex justify-content-center gap-2">-</span>
+                    <span className="text-body-secondary">−</span>
                   )}
                 </td>
               </tr>

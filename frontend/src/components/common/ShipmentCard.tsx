@@ -1,6 +1,14 @@
+'use client';
+
 import { MergedShipment } from "@/types/order";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function ShipmentCard({ shipment }: { shipment: MergedShipment }) {
+    const [expanded, setExpanded] = useState(false);
+    
+    const visibleIds = expanded ? shipment.mergedOrderIds : shipment.mergedOrderIds.slice(0, 3);
+
     return (
         <section className="border bg-white mb-4">
             <div className="p-3 bg-body-secondary">
@@ -20,9 +28,26 @@ export default function ShipmentCard({ shipment }: { shipment: MergedShipment })
                         <p className="mb-1 text-body-secondary">주문 수</p>
                             <div className="d-flex flex-wrap align-items-center gap-2">
                                 <span>{shipment.orderCount}건</span>
-                                {shipment.mergedOrderIds.map((id) => (
-                                    <span key={id} className="badge text-bg-dark">주문 #{id}</span>
-                                ))}
+
+                                <div className="d-flex flex-wrap gap-1">
+                                    {visibleIds.map((id) => (
+                                        <Link 
+                                            key={id} href={`/orders/${id}/edit`}    // TODO: 상세 페이지로 나중에 변경
+                                            className="badge text-bg-dark text-decoration-none">
+                                            주문 #{id}
+                                        </Link>
+                                    ))}
+
+                                    {shipment.mergedOrderIds.length > 3 && (
+                                        <button
+                                            type="button"
+                                            className="badge text-bg-secondary border-0"
+                                            onClick={() => setExpanded(!expanded)}
+                                        >
+                                            {expanded ? "접기" : `외 ${shipment.mergedOrderIds.length - 3}건`}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                     </div>
 
@@ -50,7 +75,7 @@ export default function ShipmentCard({ shipment }: { shipment: MergedShipment })
                                     <div className="d-flex align-items-center gap-3">
                                         {item.photoUrl ? (
                                             <img
-                                                src={`http://localhost:8080${item.photoUrl}`}
+                                                src={item.photoUrl}
                                                 alt={`${item.productName} 상품 이미지`}
                                                 className="product-image"
                                             />
@@ -71,4 +96,4 @@ export default function ShipmentCard({ shipment }: { shipment: MergedShipment })
             </div>
         </section>
     );
-}
+} 

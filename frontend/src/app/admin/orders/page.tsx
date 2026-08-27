@@ -25,7 +25,7 @@ export default function AdminOrdersPage(){
     useEffect(() => {
         // 전체 내역
         if (filter === "all"){
-            fetch("http://localhost:8080/api/orders/admin")
+            fetch("/api/orders/admin")
                 .then((res) => res.json())
                 .then((rsData) => setOrders(rsData.data));
             return;
@@ -40,7 +40,7 @@ export default function AdminOrdersPage(){
     
     // 합배송 조회
     const fetchShipments = (date: string) => {
-        fetch(`http://localhost:8080/api/orders/admin/shipments?shippingDate=${date}`)
+        fetch(`/api/orders/admin/shipments?shippingDate=${date}`)
                 .then((res) => res.json())
                 .then((rsData) => setShipments(rsData.data ?? []));
     }
@@ -55,7 +55,7 @@ export default function AdminOrdersPage(){
     const handleDelete = async (orderId: number) => {
         if (!confirm(`${orderId}번 주문을 삭제하시겠습니까?`)) return;
     
-        await fetch(`http://localhost:8080/api/orders/${orderId}`, 
+        await fetch(`/api/orders/${orderId}`, 
             {
                 method: "DELETE"
             });
@@ -123,7 +123,7 @@ export default function AdminOrdersPage(){
         {filter === "all" ? (
             <OrderTable
                 orders={orders}
-                editPath={(orderId) => `/admin/orders/${orderId}/edit`}
+                editPath={(orderId) => `/orders/${orderId}/edit`}
                 removeLabel="삭제"
                 onRemove={handleDelete}
                 showActions={isEditAble}
