@@ -2,18 +2,25 @@
 
 import OrderTable, { Order } from "@/components/common/OrderTable";
 import PageHeader from "@/components/common/PageHeader";
-import ShipmentCard from "@/components/common/ShipmentCard";
-import ShipmentItemTable from "@/components/common/ShipmentCard";
 import ShipmentList from "@/components/common/ShipmentList";
 import Button from "@/components/ui/Button";
 import { MergedShipment } from "@/types/order";
 
 import { useEffect, useState } from "react";
 
+
+// 로컬 시간 기준 yyyy-MM-dd
+const todayStr = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - offset).toISOString().split("T")[0];
+};
+
 export default function AdminOrdersPage(){
     const [orders, setOrders] = useState<Order[]>([]);
     const [shipments, setShipments] = useState<MergedShipment[]>([]);
     const [filter, setFilter] = useState<"all" | "today" | "date">("all");
+    const [selectedDate, setSelectedDate] = useState(todayStr());
 
     useEffect(() => {
         // 전체 내역
@@ -26,15 +33,17 @@ export default function AdminOrdersPage(){
 
         // 오늘 배송 내역
         if(filter === "today"){
-            const today = new Date().toISOString().split("T")[0];
-
-            fetch(`http://localhost:8080/api/orders/admin/shipments?shippingDate=${today}`)
-                .then((res) => res.json())
-                .then((rsData) => setShipments(rsData.data ?? []));
+            fetchShipments(todayStr());
         }
 
     }, [filter]);
-        
+    
+    // 합배송 조회
+    const fetchShipments = (date: string) => {
+        fetch(`http://localhost:8080/api/orders/admin/shipments?shippingDate=${date}`)
+                .then((res) => res.json())
+                .then((rsData) => setShipments(rsData.data ?? []));
+    }
 
     // 수정 가능 여부 판단
     const isEditAble = (order: Order) => {
@@ -88,6 +97,29 @@ export default function AdminOrdersPage(){
             </Button>
         </div>
         
+        {filter === "date" && (
+            <section className="border bg-white p-4 mb-4">
+                <label htmlFor="shippingDate" className="form-label">
+                    배송 날짜
+                </label>
+
+                <div className="d-flex flex-wrap gap-2">
+                    <input
+                        id="shippingDate"
+                        type="date"
+                        className="form-control w-auto"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                    />
+
+                    <Button onClick={() => fetchShipments(selectedDate)}>
+                        합배송 목록 조회
+                    </Button>
+                </div>
+            </section>
+        )}
+
+
         {filter === "all" ? (
             <OrderTable
                 orders={orders}

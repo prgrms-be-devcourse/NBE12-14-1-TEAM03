@@ -3,34 +3,33 @@ import { MergedShipment } from "@/types/order";
 export default function ShipmentCard({ shipment }: { shipment: MergedShipment }) {
     return (
         <section className="border bg-white mb-4">
-            <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 p-3 bg-body-secondary">
-                <div>
-                    <p className="mb-1 text-body-secondary">이메일</p>
-                    <p className="mb-0">{shipment.email}</p>
+            <div className="p-3 bg-body-secondary">
+                <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <span className="fw-semibold">{shipment.email}</span>
+                    <span className="text-body-secondary">·</span>
+                    <span>{shipment.shippingDate.replaceAll("-", ".")} 배송</span>
                 </div>
 
-                <div>
-                    <p className="mb-1 text-body-secondary">배송일</p>
-                    <p className="mb-0">{shipment.shippingDate.replaceAll("-", ".")}</p>
-                </div>
+                <div className="row g-3">
+                    <div className="col-md-5">
+                        <p className="mb-1 text-body-secondary">배송지</p>
+                        <p className="mb-0">{shipment.shippingAddress} ({shipment.zipCode})</p>
+                    </div>
 
-                <div>
-                    <p className="mb-1 text-body-secondary">배송지</p>
-                    <p className="mb-0">{shipment.shippingAddress}</p>
-                    <p className="mb-0 text-body-secondary">{shipment.zipCode}</p>
-                </div>
+                    <div className="col-md-4">
+                        <p className="mb-1 text-body-secondary">주문 수</p>
+                            <div className="d-flex flex-wrap align-items-center gap-2">
+                                <span>{shipment.orderCount}건</span>
+                                {shipment.mergedOrderIds.map((id) => (
+                                    <span key={id} className="badge text-bg-dark">주문 #{id}</span>
+                                ))}
+                            </div>
+                    </div>
 
-                <div className="text-end">
-                    <p className="mb-1 text-body-secondary">주문 수</p>
-                    <p className="mb-0">{shipment.orderCount}건</p>
-                    <p className="mb-0 text-body-secondary">
-                        #{shipment.mergedOrderIds.join(", #")}
-                    </p>
-                </div>
-
-                <div className="text-end">
-                    <p className="mb-1 text-body-secondary">총금액</p>
-                    <p className="mb-0">{shipment.totalPrice.toLocaleString("ko-KR")}원</p>
+                    <div className="col-md-3 text-md-end">
+                        <p className="mb-1 text-body-secondary">총금액</p>
+                        <p className="mb-0 fw-semibold">{shipment.totalPrice.toLocaleString("ko-KR")}원</p>
+                    </div>
                 </div>
             </div>
 

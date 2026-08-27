@@ -1,10 +1,17 @@
 :root {
   --background: #f5f5f2;
   --foreground: #171717;
+  --app-product-image-size: 64px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.product-image {
+  width: var(--app-product-image-size);
+  height: var(--app-product-image-size);
+  object-fit: cover;
 }
