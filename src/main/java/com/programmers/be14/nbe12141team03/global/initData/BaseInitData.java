@@ -37,7 +37,6 @@ public class BaseInitData {
         return args -> {
             self.work1();
             self.work2();
-            self.work3();
         };
     }
 
@@ -67,76 +66,110 @@ public class BaseInitData {
 
         // ===== 지난 배송 (수정/취소 불가 케이스) =====
 
-        // 3일 전 - 합배송 2건
-        OrderResult p1 = new OrderResult("hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234", today.minusDays(3));
+        // 3일 전 배송 - 합배송 2건
+        OrderResult p1 = new OrderResult(
+                orderedBefore(today.minusDays(3), 10, 15),
+                "hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234");
         p1.addOrderItem(new OrderItem(narino, narino.getPrice(), 1));
 
-        OrderResult p2 = new OrderResult("hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234", today.minusDays(3));
+        OrderResult p2 = new OrderResult(
+                orderedAfter(today.minusDays(3), 16, 40),
+                "hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234");
         p2.addOrderItem(new OrderItem(quindio, quindio.getPrice(), 2));
 
-        // 2일 전
-        OrderResult p3 = new OrderResult("minji@test.com", "광주시 서구 상무대로 7", "61949", today.minusDays(2));
+        // 2일 전 배송
+        OrderResult p3 = new OrderResult(
+                orderedAfter(today.minusDays(2), 18, 5),
+                "minji@test.com", "광주시 서구 상무대로 7", "61949");
         p3.addOrderItem(new OrderItem(brazil, brazil.getPrice(), 3));
         p3.addOrderItem(new OrderItem(ethiopia, ethiopia.getPrice(), 1));
 
-        // 어제 - 같은 이메일이지만 배송지가 달라 분리되는 케이스
-        OrderResult p4 = new OrderResult("sujee@test.com", "부산시 해운대구 우동 2", "48095", today.minusDays(1));
+        // 어제 배송 - 같은 이메일이지만 배송지가 달라 분리되는 케이스
+        OrderResult p4 = new OrderResult(
+                orderedBefore(today.minusDays(1), 9, 30),
+                "sujee@test.com", "부산시 해운대구 우동 2", "48095");
         p4.addOrderItem(new OrderItem(narino, narino.getPrice(), 2));
 
-        OrderResult p5 = new OrderResult("sujee@test.com", "부산시 수영구 광안로 9", "48300", today.minusDays(1));
+        OrderResult p5 = new OrderResult(
+                orderedAfter(today.minusDays(1), 20, 12),
+                "sujee@test.com", "부산시 수영구 광안로 9", "48300");
         p5.addOrderItem(new OrderItem(ethiopia, ethiopia.getPrice(), 1));
 
         // ===== 오늘 배송 =====
 
         // 합배송 3건 - 같은 상품이 여러 주문에 걸쳐 합산되는 케이스
-        OrderResult t1 = new OrderResult("hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234", today);
+        OrderResult t1 = new OrderResult(
+                orderedAfter(today, 14, 0),          // 어제 14:00 정각 - 경계값
+                "hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234");
         t1.addOrderItem(new OrderItem(narino, narino.getPrice(), 2));
         t1.addOrderItem(new OrderItem(brazil, brazil.getPrice(), 1));
 
-        OrderResult t2 = new OrderResult("hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234", today);
+        OrderResult t2 = new OrderResult(
+                orderedAfter(today, 22, 45),
+                "hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234");
         t2.addOrderItem(new OrderItem(narino, narino.getPrice(), 3));
 
-        OrderResult t3 = new OrderResult("hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234", today);
+        OrderResult t3 = new OrderResult(
+                orderedBefore(today, 13, 59),        // 오늘 13:59 - 경계값
+                "hoonhee@test.com", "서울시 강남구 테헤란로 1", "06234");
         t3.addOrderItem(new OrderItem(quindio, quindio.getPrice(), 1));
         t3.addOrderItem(new OrderItem(ethiopia, ethiopia.getPrice(), 2));
 
         // 단독 주문
-        OrderResult t4 = new OrderResult("sujee@test.com", "부산시 해운대구 우동 2", "48095", today);
+        OrderResult t4 = new OrderResult(
+                orderedBefore(today, 8, 20),
+                "sujee@test.com", "부산시 해운대구 우동 2", "48095");
         t4.addOrderItem(new OrderItem(ethiopia, ethiopia.getPrice(), 1));
 
         // 상품 4종 전부
-        OrderResult t5 = new OrderResult("jaechul@test.com", "인천시 연수구 송도과학로 4", "21999", today);
+        OrderResult t5 = new OrderResult(
+                orderedAfter(today, 15, 33),
+                "jaechul@test.com", "인천시 연수구 송도과학로 4", "21999");
         t5.addOrderItem(new OrderItem(narino, narino.getPrice(), 1));
         t5.addOrderItem(new OrderItem(brazil, brazil.getPrice(), 1));
         t5.addOrderItem(new OrderItem(quindio, quindio.getPrice(), 1));
         t5.addOrderItem(new OrderItem(ethiopia, ethiopia.getPrice(), 1));
 
         // 대량 주문
-        OrderResult t6 = new OrderResult("cafe@test.com", "서울시 마포구 홍익로 12", "04039", today);
+        OrderResult t6 = new OrderResult(
+                orderedAfter(today, 19, 8),
+                "cafe@test.com", "서울시 마포구 홍익로 12", "04039");
         t6.addOrderItem(new OrderItem(narino, narino.getPrice(), 20));
         t6.addOrderItem(new OrderItem(brazil, brazil.getPrice(), 15));
 
         // ===== 내일 배송 =====
 
-        OrderResult n1 = new OrderResult("heewon@test.com", "대전시 유성구 대학로 3", "34126", today.plusDays(1));
+        OrderResult n1 = new OrderResult(
+                orderedAfter(today.plusDays(1), 14, 1),
+                "heewon@test.com", "대전시 유성구 대학로 3", "34126");
         n1.addOrderItem(new OrderItem(brazil, brazil.getPrice(), 2));
 
-        OrderResult n2 = new OrderResult("heewon@test.com", "대전시 유성구 대학로 3", "34126", today.plusDays(1));
+        OrderResult n2 = new OrderResult(
+                orderedAfter(today.plusDays(1), 17, 22),
+                "heewon@test.com", "대전시 유성구 대학로 3", "34126");
         n2.addOrderItem(new OrderItem(quindio, quindio.getPrice(), 1));
 
-        OrderResult n3 = new OrderResult("dukwoo@test.com", "제주시 첨단로 8", "63309", today.plusDays(1));
+        OrderResult n3 = new OrderResult(
+                orderedAfter(today.plusDays(1), 21, 50),
+                "dukwoo@test.com", "제주시 첨단로 8", "63309");
         n3.addOrderItem(new OrderItem(narino, narino.getPrice(), 5));
 
         // ===== 모레 이후 =====
 
-        OrderResult f1 = new OrderResult("jaechul@test.com", "인천시 연수구 송도과학로 4", "21999", today.plusDays(2));
+        OrderResult f1 = new OrderResult(
+                orderedAfter(today.plusDays(2), 16, 15),
+                "jaechul@test.com", "인천시 연수구 송도과학로 4", "21999");
         f1.addOrderItem(new OrderItem(quindio, quindio.getPrice(), 1));
 
-        OrderResult f2 = new OrderResult("minji@test.com", "광주시 서구 상무대로 7", "61949", today.plusDays(2));
+        OrderResult f2 = new OrderResult(
+                orderedAfter(today.plusDays(2), 23, 3),
+                "minji@test.com", "광주시 서구 상무대로 7", "61949");
         f2.addOrderItem(new OrderItem(ethiopia, ethiopia.getPrice(), 4));
         f2.addOrderItem(new OrderItem(narino, narino.getPrice(), 2));
 
-        OrderResult f3 = new OrderResult("cafe@test.com", "서울시 마포구 홍익로 12", "04039", today.plusDays(3));
+        OrderResult f3 = new OrderResult(
+                orderedAfter(today.plusDays(3), 14, 30),
+                "cafe@test.com", "서울시 마포구 홍익로 12", "04039");
         f3.addOrderItem(new OrderItem(brazil, brazil.getPrice(), 10));
 
         // ===== 대량 합배송 (오늘, 12건) =====
@@ -144,7 +177,8 @@ public class BaseInitData {
         List<OrderResult> bulkToday = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
             OrderResult b = new OrderResult(
-                    "bulk@test.com", "서울시 종로구 세종대로 100", "03172", today);
+                    orderedAfter(today, 14 + (i % 9), i * 4 % 60),
+                    "bulk@test.com", "서울시 종로구 세종대로 100", "03172");
 
             Product p = products.get(i % 4);
             b.addOrderItem(new OrderItem(p, p.getPrice(), (i % 3) + 1));
@@ -156,7 +190,8 @@ public class BaseInitData {
         List<OrderResult> bulkTomorrow = new ArrayList<>();
         for (int i = 1; i <= 25; i++) {
             OrderResult b = new OrderResult(
-                    "heavy@test.com", "경기도 성남시 분당구 판교로 200", "13529", today.plusDays(1));
+                    orderedAfter(today.plusDays(1), 14 + (i % 9), i * 7 % 60),
+                    "heavy@test.com", "경기도 성남시 분당구 판교로 200", "13529");
 
             b.addOrderItem(new OrderItem(narino, narino.getPrice(), 1));
             if (i % 2 == 0) {
@@ -176,24 +211,15 @@ public class BaseInitData {
         orderResultRepository.saveAll(bulkTomorrow);
     }
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    // 14:00 이전 주문 - 배송일 당일에 주문한 것으로 처리
+    private LocalDateTime orderedBefore(LocalDate shippingDate, int hour, int minute) {
+        if (hour >= 14) throw new IllegalArgumentException("14시 미만이어야 합니다");
+        return shippingDate.atTime(hour, minute);
+    }
 
-    @Transactional
-    public void work3() {
-        List<OrderResult> all = orderResultRepository.findAll();
-
-        for (OrderResult o : all) {
-            // 배송일 하루 전, id에 따라 시각 분산
-            LocalDateTime created = o.getShippingDate()
-                    .minusDays(1)
-                    .atTime(9 + (int)(o.getId() % 12), (int)(o.getId() * 7 % 60));
-
-            entityManager.createNativeQuery(
-                            "UPDATE order_result SET create_date = :d WHERE id = :id")
-                    .setParameter("d", created)
-                    .setParameter("id", o.getId())
-                    .executeUpdate();
-        }
+    // 14:00 이후 주문 - 배송일 하루 전에 주문한 것으로 처리
+    private LocalDateTime orderedAfter(LocalDate shippingDate, int hour, int minute) {
+        if (hour < 14) throw new IllegalArgumentException("14시 이후이어야 합니다");
+        return shippingDate.minusDays(1).atTime(hour, minute);
     }
 }
