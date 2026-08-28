@@ -66,10 +66,24 @@ export default function OrderCompletePage() {
     };
   }, [orderId]);
 
-  const handleMoveToMyOrders = () => {
-    if (order) {
-      sessionStorage.setItem("orderEmail", order.email);
+
+  const isFromAdmin = searchParams.get("from") === "admin";
+
+  const handleMoveToList = () => {
+    if (isFromAdmin) {
+      const filter = searchParams.get("filter") ?? "all";
+      const date = searchParams.get("date");
+
+      const query = date
+        ? `?filter=${filter}&date=${date}`
+        : `?filter=${filter}`;
+
+      router.push(`/admin/orders${query}`);
+      return;
     }
+
+    if (!order) return;
+    sessionStorage.setItem("orderEmail", order.email);
     router.push("/my-orders");
   };
 
@@ -164,7 +178,7 @@ export default function OrderCompletePage() {
 
                 <Button
                   variant="dark"
-                  onClick={handleMoveToMyOrders}
+                  onClick={handleMoveToList}
                 >
                   {isCreated ? "주문 내역" : "목록"}
                 </Button>

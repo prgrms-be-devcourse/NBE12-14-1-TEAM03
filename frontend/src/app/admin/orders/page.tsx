@@ -6,6 +6,7 @@ import ShipmentList from "@/components/common/ShipmentList";
 import Button from "@/components/ui/Button";
 import ErrorDisplay from "@/components/common/ErrorDisplay";
 import { MergedShipment, OrderResultResponse } from "@/types/order";
+import { useSearchParams } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 
 import { useEffect, useState } from "react";
@@ -18,10 +19,14 @@ const todayStr = () => {
 };
 
 export default function AdminOrdersPage(){
+    const searchParams = useSearchParams();
     const [orders, setOrders] = useState<OrderResultResponse[]>([]);
     const [shipments, setShipments] = useState<MergedShipment[]>([]);
-    const [filter, setFilter] = useState<"all" | "today" | "date">("all");
-    const [selectedDate, setSelectedDate] = useState(todayStr());
+    const [filter, setFilter] = useState<"all" | "today" | "date">((searchParams.get("filter") as "all" | "today" | "date") ?? "all");
+    const [selectedDate, setSelectedDate] = useState(searchParams.get("date") ?? todayStr());
+    const backQuery = filter === "all"
+        ? "from=admin&filter=all"
+        : `from=admin&filter=${filter}&date=${filter === "today" ? todayStr() : selectedDate}`;
     const [fetchError, setFetchError] = useState<{
         statusCode: number;
         message: string;
@@ -75,6 +80,10 @@ export default function AdminOrdersPage(){
         // 오늘 배송 내역
         if(filter === "today"){
             void fetchShipments(todayStr());
+        }
+        
+        if (filter === "date"){
+            fetchShipments(selectedDate);
         }
 
     }, [filter]);
@@ -172,6 +181,7 @@ export default function AdminOrdersPage(){
         ) : filter === "all" ? (
             <OrderTable
                 orders={orders}
+                detailPath={(orderId) => `/orders/${orderId}?${backQuery}`}
                 editPath={(orderId) => `/orders/${orderId}/edit`}
                 removeLabel="삭제"
                 onRemove={handleDelete}
@@ -179,7 +189,7 @@ export default function AdminOrdersPage(){
                 showCustomerEmail
             />
         ) : (
-            <ShipmentList shipments={shipments} />
+            <ShipmentList shipments={shipments} backQuery={backQuery} />
         )}
         </>
     );

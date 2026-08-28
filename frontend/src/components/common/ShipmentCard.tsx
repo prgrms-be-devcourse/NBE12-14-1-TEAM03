@@ -4,7 +4,13 @@ import { MergedShipment } from "@/types/order";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function ShipmentCard({ shipment }: { shipment: MergedShipment }) {
+export default function ShipmentCard({
+    shipment,
+    backQuery = "from=admin",
+}: {
+    shipment: MergedShipment;
+    backQuery?: string;
+}) {
     const [expanded, setExpanded] = useState(false);
     
     const visibleIds = expanded ? shipment.mergedOrderIds : shipment.mergedOrderIds.slice(0, 3);
@@ -32,7 +38,8 @@ export default function ShipmentCard({ shipment }: { shipment: MergedShipment })
                                 <div className="d-flex flex-wrap gap-1">
                                     {visibleIds.map((id) => (
                                         <Link 
-                                            key={id} href={`/orders/${id}/edit`}    // TODO: 상세 페이지로 나중에 변경
+                                            key={id}
+                                            href={`/orders/${id}?${backQuery}`}
                                             className="badge text-bg-dark text-decoration-none">
                                             주문 #{id}
                                         </Link>

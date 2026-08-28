@@ -3,7 +3,14 @@
 import { MergedShipment } from "@/types/order";
 import ShipmentCard from "./ShipmentCard";
 
-export default function ShipmentList({ shipments }: { shipments: MergedShipment[] }) {
+export default function ShipmentList({
+    shipments,
+    backQuery,
+}: {
+    shipments: MergedShipment[];
+    backQuery?: string;
+}) {
+
     if (shipments.length === 0) {
         return (
             <div className="border bg-white p-5 text-center text-body-secondary">
@@ -20,6 +27,7 @@ export default function ShipmentList({ shipments }: { shipments: MergedShipment[
                 <ShipmentCard
                     key={`${shipment.email}-${shipment.zipCode}`}
                     shipment={shipment}
+                    backQuery={backQuery}
                 />
             ))}
         </>
