@@ -12,7 +12,7 @@ public class OrderCreateResponse {
 
     private String email;
 
-    private int totalPrice;
+    private long totalPrice;
 
     private LocalDate shippingDate;
 

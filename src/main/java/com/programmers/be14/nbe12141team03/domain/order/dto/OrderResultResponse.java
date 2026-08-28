@@ -13,7 +13,7 @@ public record OrderResultResponse(
         String email,
         String shippingAddress,
         String zipCode,
-        int totalPrice,
+        long totalPrice,
         LocalDate shippingDate,
         List<OrderItemResponse> orderItemList,
         boolean modifiable

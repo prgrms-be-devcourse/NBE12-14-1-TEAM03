@@ -73,10 +73,10 @@ public class OrderResultService {
                 .map(OrderResult::getId)
                 .toList();
 
-        // 하나의 합배송의 총 금액
-        int totalPrice = group.stream()
-                .mapToInt(OrderResult::getTotalPrice)
-                .sum();
+        // 하나의 합배송의 총 금액, long 범위 초과시 예외
+        long totalPrice = group.stream()
+                .mapToLong(OrderResult::getTotalPrice)
+                .reduce(0L, Math::addExact);
 
         Map<Long, MergedItemResponse> itemMap = new LinkedHashMap<>();
 
@@ -97,7 +97,10 @@ public class OrderResultService {
                                 existing.productName(),
                                 existing.photoUrl(),
                                 existing.quantity() + incoming.quantity(),
-                                existing.totalPrice() + incoming.totalPrice()
+                                Math.addExact(
+                                        existing.totalPrice(),
+                                        incoming.totalPrice()
+                                )
                         ));
             }
         }

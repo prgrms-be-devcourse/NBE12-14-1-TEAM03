@@ -6,9 +6,9 @@ public record OrderItemResponse(
         Long productId,
         String productName,
         String photoUrl,
-        int orderPrice,
+        long orderPrice,
         int quantity,
-        int totalPrice
+        long totalPrice
 ) {
     public OrderItemResponse(OrderItem orderItem) {
         this(

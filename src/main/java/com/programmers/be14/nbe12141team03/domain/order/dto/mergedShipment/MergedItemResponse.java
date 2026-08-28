@@ -5,6 +5,6 @@ public record MergedItemResponse(
         String productName,
         String photoUrl,
         int quantity,
-        int totalPrice
+        long totalPrice
 ) {
 }
