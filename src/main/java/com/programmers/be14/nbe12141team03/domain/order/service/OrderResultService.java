@@ -1,8 +1,8 @@
 package com.programmers.be14.nbe12141team03.domain.order.service;
 
-import com.programmers.be14.nbe12141team03.domain.order.dto.create.OrderCreateRequest;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderItemRequest;
 import com.programmers.be14.nbe12141team03.domain.order.dto.OrderResultResponse;
+import com.programmers.be14.nbe12141team03.domain.order.dto.create.OrderCreateRequest;
 import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedItemResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.mergedShipment.MergedShipmentResponse;
 import com.programmers.be14.nbe12141team03.domain.order.dto.modify.OrderModifyRequest;
@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -195,6 +194,14 @@ public class OrderResultService {
                                 "404-1",
                                 "존재하지 않는 주문입니다."
                         ));
+
+        // 이미 배송일이 지난 상품 예외 처리
+        if (!orderResult.isModifiable(LocalDateTime.now())) {
+            throw new ApiServiceException(
+                    "400-1",
+                    "이미 배송 준비가 시작되어 취소할 수 없습니다."
+            );
+        }
 
         orderResultRepository.delete(orderResult);
     }

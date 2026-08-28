@@ -81,9 +81,8 @@ export default function AdminOrdersPage(){
 
     // 수정 가능 여부 판단
     const isEditAble = (order: OrderResultResponse) => {
-        const deadline = new Date(`${order.shippingDate}T14:00:00`);
-        return new Date() < deadline;
-    };
+        return order.modifiable;
+    }
 
     // 주문 삭제 핸들러
     const handleDelete = async (orderId: number) => {
