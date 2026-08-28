@@ -40,3 +40,5 @@ out/
 .env
 *.db
 .agents/rules/grinds-n-circle-style-rules.md
+.DS_Store
+.DS_Store
