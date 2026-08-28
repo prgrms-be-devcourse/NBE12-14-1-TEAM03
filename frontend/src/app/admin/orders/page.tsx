@@ -182,7 +182,7 @@ export default function AdminOrdersPage(){
             <OrderTable
                 orders={orders}
                 detailPath={(orderId) => `/orders/${orderId}?${backQuery}`}
-                editPath={(orderId) => `/orders/${orderId}/edit`}
+                editPath={(orderId) => `/orders/${orderId}/edit?${backQuery}`}
                 removeLabel="삭제"
                 onRemove={handleDelete}
                 showActions={isEditAble}
