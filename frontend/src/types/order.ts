@@ -17,6 +17,7 @@ export interface OrderResultResponse {
   totalPrice: number;
   shippingDate: string;
   orderItemList: OrderItemResponse[];
+  modifiable: boolean;
 }
 
 export interface OrderModifyItemRequest {

@@ -1,6 +1,5 @@
 package com.programmers.be14.nbe12141team03.domain.order.dto;
 
-import com.programmers.be14.nbe12141team03.domain.order.entity.OrderItem;
 import com.programmers.be14.nbe12141team03.domain.order.entity.OrderResult;
 
 import java.time.LocalDate;
@@ -16,7 +15,8 @@ public record OrderResultResponse(
         String zipCode,
         int totalPrice,
         LocalDate shippingDate,
-        List<OrderItemResponse> orderItemList
+        List<OrderItemResponse> orderItemList,
+        boolean modifiable
 ) {
     public OrderResultResponse(OrderResult orderResult){
         this(
@@ -30,7 +30,8 @@ public record OrderResultResponse(
                 orderResult.getShippingDate(),
                 orderResult.getOrderItemList().stream()
                         .map(OrderItemResponse::new)
-                        .toList()
+                        .toList(),
+                orderResult.isModifiable(LocalDateTime.now())
         );
     }
 }
