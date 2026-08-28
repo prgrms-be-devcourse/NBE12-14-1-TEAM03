@@ -24,6 +24,7 @@ public interface OrderResultRepository extends JpaRepository<OrderResult, Long> 
                 from OrderResult o
                 join fetch o.orderItemList oi
                 join fetch oi.product
+                order by o.createDate desc
             """)
     public List<OrderResult> findAllWithItemsAndProducts();
 
@@ -33,17 +34,16 @@ public interface OrderResultRepository extends JpaRepository<OrderResult, Long> 
                 join fetch o.orderItemList oi
                 join fetch oi.product
                 where o.email = :email
-            
+                order by o.createDate desc
             """)
     public List<OrderResult> findByEmailWithItemsAndProducts(String email);
+
     @Query("""
                 select distinct o
                 from OrderResult o
                 join fetch o.orderItemList oi
                 join fetch oi.product
                 where o.shippingDate = :shippingDate
-            
             """)
     public List<OrderResult> findByShippingDateWithItemsAndProducts(LocalDate shippingDate);
-
 }
