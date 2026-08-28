@@ -35,7 +35,7 @@ public class OrderResultService {
     @Transactional(readOnly = true)
     public List<OrderResultResponse> getAllList() {
 
-        return this.orderResultRepository.findAll().reversed().stream()
+        return this.orderResultRepository.findAllByOrderByCreateDateDesc().stream()
                 .map(OrderResultResponse::new)
                 .toList();
     }
@@ -123,7 +123,7 @@ public class OrderResultService {
     @Transactional(readOnly = true)
     public List<OrderResultResponse> findMyOrders(String email) {
 
-        return this.orderResultRepository.findByEmail(email).reversed().stream()
+        return this.orderResultRepository.findByEmailOrderByCreateDateDesc(email).stream()
                 .map(OrderResultResponse::new)
                 .toList();
     }

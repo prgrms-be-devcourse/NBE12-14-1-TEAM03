@@ -10,4 +10,6 @@ import java.util.List;
 public interface OrderResultRepository extends JpaRepository<OrderResult, Long> {
     public List<OrderResult> findByEmail(String email);
     public List<OrderResult> findByShippingDate(LocalDate shippingDate);
+    public List<OrderResult> findAllByOrderByCreateDateDesc();
+    public List<OrderResult> findByEmailOrderByCreateDateDesc(String email);
 }
