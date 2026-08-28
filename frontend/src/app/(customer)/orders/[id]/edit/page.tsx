@@ -5,51 +5,14 @@ import { useParams, useRouter } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import QuantityControl from "@/components/common/QuantityControl";
 import Button from "@/components/ui/Button";
+import ErrorDisplay from "@/components/common/ErrorDisplay";
 import {
   OrderResultResponse,
   OrderModifyRequest,
   ProductResponse,
-  RsData,
 } from "@/types/order";
+import { api, ApiError } from "@/lib/api";
 import { formatCurrency } from "@/lib/formatters";
-
-// 와이어프레임 기본 주문 목데이터
-const DEFAULT_ORDER_DATA: OrderResultResponse = {
-  id: 1,
-  createDate: "2026-08-26T13:42:00",
-  email: "suji@example.com",
-  shippingAddress: "서울시 강남구 테헤란로 00",
-  zipCode: "06236",
-  shippingDate: "2026-08-26",
-  totalPrice: 16500,
-  orderItemList: [
-    {
-      productId: 1,
-      productName: "Columbia Nariño",
-      photoUrl: "/images/columbia-narino.png",
-      orderPrice: 5000,
-      quantity: 2,
-      totalPrice: 10000,
-    },
-    {
-      productId: 2,
-      productName: "Brazil Serra Do Caparaó",
-      photoUrl: "/images/brazil-serra.png",
-      orderPrice: 6000,
-      quantity: 1,
-      totalPrice: 6000,
-    },
-  ],
-  modifiable: false
-};
-
-// 와이어프레임 기본 상품 목록 목데이터
-const DEFAULT_PRODUCTS: ProductResponse[] = [
-  { id: 1, name: "Columbia Nariñó", price: 5000, category: "커피콩", photoUrl: "/images/columbia-narino.png" },
-  { id: 2, name: "Brazil Serra Do Caparaó", price: 6000, category: "커피콩", photoUrl: "/images/brazil-serra.png" },
-  { id: 3, name: "Ethiopia Sidamo", price: 5500, category: "커피콩", photoUrl: "/images/ethiopia-sidamo.png" },
-  { id: 4, name: "Columbia Quindío", price: 8000, category: "커피콩", photoUrl: "/images/columbia-quindio.png" },
-];
 
 interface EditableOrderItem {
   productId: number;
@@ -64,68 +27,66 @@ export default function OrderEditPage() {
   const orderId = params?.id as string | undefined;
   const router = useRouter();
 
-  const [email, setEmail] = useState<string>(DEFAULT_ORDER_DATA.email);
-  const [shippingAddress, setShippingAddress] = useState<string>(
-    DEFAULT_ORDER_DATA.shippingAddress
-  );
-  const [zipCode, setZipCode] = useState<string>(DEFAULT_ORDER_DATA.zipCode);
-  const [items, setItems] = useState<EditableOrderItem[]>(
-    DEFAULT_ORDER_DATA.orderItemList.map((item) => ({
-      productId: item.productId,
-      productName: item.productName,
-      orderPrice: item.orderPrice,
-      quantity: item.quantity,
-    }))
-  );
+  const [email, setEmail] = useState<string>("");
+  const [shippingAddress, setShippingAddress] = useState<string>("");
+  const [zipCode, setZipCode] = useState<string>("");
+  const [items, setItems] = useState<EditableOrderItem[]>([]);
 
-  const [availableProducts, setAvailableProducts] =
-    useState<ProductResponse[]>(DEFAULT_PRODUCTS);
+  const [availableProducts, setAvailableProducts] = useState<ProductResponse[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<{
+    statusCode: number;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadData() {
-      // 1. 상품 목록 조회
+      if (!orderId) return;
+
       try {
-        const prodRes = await fetch("/api/products");
-        if (prodRes.ok) {
-          const prodData: RsData<ProductResponse[]> = await prodRes.json();
-          if (prodData && prodData.data && isMounted) {
-            setAvailableProducts(prodData.data);
+        setLoading(true);
+        setFetchError(null);
+
+        const [prodData, orderData] = await Promise.all([
+          api<ProductResponse[]>("/api/products"),
+          api<OrderResultResponse>(`/api/orders/mypage/${orderId}`),
+        ]);
+
+        if (isMounted) {
+          setAvailableProducts(prodData.data ?? []);
+          const fetched = orderData.data;
+          setEmail(fetched.email);
+          setShippingAddress(fetched.shippingAddress);
+          setZipCode(fetched.zipCode);
+          setItems(
+            fetched.orderItemList.map((item) => ({
+              productId: item.productId,
+              productName: item.productName,
+              photoUrl: item.photoUrl,
+              orderPrice: item.orderPrice,
+              quantity: item.quantity,
+            }))
+          );
+        }
+      } catch (err) {
+        if (isMounted) {
+          if (err instanceof ApiError) {
+            setFetchError({ statusCode: err.statusCode, message: err.message });
+          } else {
+            setFetchError({
+              statusCode: 500,
+              message: "주문 또는 상품 정보를 불러오지 못했습니다.",
+            });
           }
         }
-      } catch {
-        // 기본 상품 목데이터 유지
-      }
-
-      // 2. 기존 주문 정보 조회
-      if (orderId) {
-        try {
-          const orderRes = await fetch(`/api/orders/mypage/${orderId}`);
-          if (orderRes.ok) {
-            const orderData: RsData<OrderResultResponse> =
-              await orderRes.json();
-            if (orderData && orderData.data && isMounted) {
-              const fetched = orderData.data;
-              setEmail(fetched.email);
-              setShippingAddress(fetched.shippingAddress);
-              setZipCode(fetched.zipCode);
-              setItems(
-                fetched.orderItemList.map((item) => ({
-                  productId: item.productId,
-                  productName: item.productName,
-                  photoUrl: item.photoUrl,
-                  orderPrice: item.orderPrice,
-                  quantity: item.quantity,
-                }))
-              );
-            }
-          }
-        } catch {
-          // 기본 목데이터 유지
+      } finally {
+        if (isMounted) {
+          setLoading(false);
         }
       }
     }
@@ -222,36 +183,43 @@ export default function OrderEditPage() {
 
     try {
       if (orderId) {
-        const res = await fetch(`/api/orders/${orderId}`, {
+        await api<OrderResultResponse>(`/api/orders/${orderId}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify(requestBody),
         });
-
-        if (res.ok) {
-          router.push(`/orders/${orderId}`); //TODO: 목록으로 이동(관리자, 사용자 분기 처리)
-          return;
-        } else {
-          const errData = await res.json().catch(() => null);
-          setErrorMessage(
-            errData?.msg || "주문 수정 중 오류가 발생했습니다."
-          );
-        }
+        router.push(`/orders/${orderId}`);
+        return;
       } else {
         // orderId가 없는 경우 orders 페이지로 이동
         router.push("/orders");
       }
-    } catch {
-      // API 통신 실패 시에도 데모 경험을 위해 상세 페이지로 이동
-      if (orderId) {
-        router.push(`/orders/${orderId}`);
-      }
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "주문 수정 중 오류가 발생했습니다."
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (fetchError) {
+    return (
+      <ErrorDisplay
+        statusCode={fetchError.statusCode}
+        message={fetchError.message}
+      />
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-5 text-body-secondary border bg-white p-4">
+        주문 정보를 불러오는 중입니다...
+      </div>
+    );
+  }
 
   return (
     <>

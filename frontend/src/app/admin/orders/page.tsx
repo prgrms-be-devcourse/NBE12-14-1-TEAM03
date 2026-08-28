@@ -4,10 +4,11 @@ import OrderTable from "@/components/common/OrderTable";
 import PageHeader from "@/components/common/PageHeader";
 import ShipmentList from "@/components/common/ShipmentList";
 import Button from "@/components/ui/Button";
+import ErrorDisplay from "@/components/common/ErrorDisplay";
 import { MergedShipment, OrderResultResponse } from "@/types/order";
+import { api, ApiError } from "@/lib/api";
 
 import { useEffect, useState } from "react";
-
 
 // 로컬 시간 기준 yyyy-MM-dd
 const todayStr = () => {
@@ -21,29 +22,62 @@ export default function AdminOrdersPage(){
     const [shipments, setShipments] = useState<MergedShipment[]>([]);
     const [filter, setFilter] = useState<"all" | "today" | "date">("all");
     const [selectedDate, setSelectedDate] = useState(todayStr());
+    const [fetchError, setFetchError] = useState<{
+        statusCode: number;
+        message: string;
+    } | null>(null);
+
+    // 전체 주문 조회
+    const fetchAllOrders = async () => {
+        try {
+            setFetchError(null);
+            const rsData = await api<OrderResultResponse[]>("/api/orders/admin");
+            setOrders(rsData.data ?? []);
+        } catch (err) {
+            if (err instanceof ApiError) {
+                setFetchError({ statusCode: err.statusCode, message: err.message });
+            } else {
+                setFetchError({
+                    statusCode: 500,
+                    message: "주문 목록 조회에 실패했습니다.",
+                });
+            }
+        }
+    };
+
+    // 합배송 조회
+    const fetchShipments = async (date: string) => {
+        try {
+            setFetchError(null);
+            const rsData = await api<MergedShipment[]>(
+                `/api/orders/admin/shipments?shippingDate=${date}`
+            );
+            setShipments(rsData.data ?? []);
+        } catch (err) {
+            if (err instanceof ApiError) {
+                setFetchError({ statusCode: err.statusCode, message: err.message });
+            } else {
+                setFetchError({
+                    statusCode: 500,
+                    message: "합배송 목록 조회에 실패했습니다.",
+                });
+            }
+        }
+    };
 
     useEffect(() => {
         // 전체 내역
         if (filter === "all"){
-            fetch("/api/orders/admin")
-                .then((res) => res.json())
-                .then((rsData) => setOrders(rsData.data));
+            void fetchAllOrders();
             return;
         }
 
         // 오늘 배송 내역
         if(filter === "today"){
-            fetchShipments(todayStr());
+            void fetchShipments(todayStr());
         }
 
     }, [filter]);
-    
-    // 합배송 조회
-    const fetchShipments = (date: string) => {
-        fetch(`/api/orders/admin/shipments?shippingDate=${date}`)
-                .then((res) => res.json())
-                .then((rsData) => setShipments(rsData.data ?? []));
-    }
 
     // 수정 가능 여부 판단
     const isEditAble = (order: OrderResultResponse) => {
@@ -53,18 +87,21 @@ export default function AdminOrdersPage(){
     // 주문 삭제 핸들러
     const handleDelete = async (orderId: number) => {
         if (!confirm(`${orderId}번 주문을 삭제하시겠습니까?`)) return;
-    
-        await fetch(`/api/orders/${orderId}`, 
-            {
-                method: "DELETE"
-            });
-        setOrders((prev) => {
-            return prev.filter((o) => {
-                 return o.id !== orderId;
-            });
-        });
-    }
 
+        try {
+            const rsData = await api<null>(`/api/orders/${orderId}`, {
+                method: "DELETE",
+            });
+            alert(rsData.msg || `${orderId}번 주문이 삭제되었습니다.`);
+            setOrders((prev) => prev.filter((o) => o.id !== orderId));
+        } catch (err) {
+            if (err instanceof ApiError) {
+                alert(err.message || "주문 삭제에 실패했습니다.");
+            } else {
+                alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+            }
+        }
+    };
 
     return (
         <>
@@ -97,7 +134,7 @@ export default function AdminOrdersPage(){
                 날짜별 배송
             </Button>
         </div>
-        
+
         {filter === "date" && (
             <section className="border bg-white p-4 mb-4">
                 <label htmlFor="shippingDate" className="form-label">
@@ -113,15 +150,26 @@ export default function AdminOrdersPage(){
                         onChange={(e) => setSelectedDate(e.target.value)}
                     />
 
-                    <Button onClick={() => fetchShipments(selectedDate)}>
+                    <Button onClick={() => void fetchShipments(selectedDate)}>
                         합배송 목록 조회
                     </Button>
                 </div>
             </section>
         )}
 
-        {/* 내역 테이블 */}
-        {filter === "all" ? (
+        {/* 에러 화면 또는 내역 테이블 */}
+        {fetchError ? (
+            <ErrorDisplay
+                statusCode={fetchError.statusCode}
+                message={fetchError.message}
+                onRetry={() => {
+                    setFetchError(null);
+                    if (filter === "all") void fetchAllOrders();
+                    else if (filter === "today") void fetchShipments(todayStr());
+                    else void fetchShipments(selectedDate);
+                }}
+            />
+        ) : filter === "all" ? (
             <OrderTable
                 orders={orders}
                 editPath={(orderId) => `/orders/${orderId}/edit`}

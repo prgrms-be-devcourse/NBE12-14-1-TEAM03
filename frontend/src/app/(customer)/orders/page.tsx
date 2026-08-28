@@ -5,11 +5,12 @@ import type { FormEvent } from "react";
 import type { ProductResponse } from "@/types/product";
 import type {
     OrderCreateRequest,
-    OrderCreateResponse,
-    RsData,
+    OrderCreateResponse
 } from "@/types/order";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
+import ErrorDisplay from "@/components/common/ErrorDisplay";
+import { api, ApiError } from "@/lib/api";
 import { formatCurrency } from "@/lib/formatters";
 import QuantityControl from "@/components/common/QuantityControl";
 import { useRouter } from "next/navigation";
@@ -32,23 +33,29 @@ export default function CustomerOrderPage() {
     const [zipCode, setZipCode] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [fetchError, setFetchError] = useState<{
+        statusCode: number;
+        message: string;
+    } | null>(null);
 
     // 페이지가 처음 열릴 때 판매 상품 목록을 조회
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const response = await fetch("/api/products");
-
-                if (!response.ok) {
-                    throw new Error("상품 목록을 불러오지 못했습니다.");
-                }
-
-                const result: RsData<ProductResponse[]> =
-                    await response.json();
-
+                const result = await api<ProductResponse[]>("/api/products");
                 setProducts(result.data);
             } catch (error) {
-                console.error(error);
+                if (error instanceof ApiError) {
+                    setFetchError({
+                        statusCode: error.statusCode,
+                        message: error.message,
+                    });
+                } else {
+                    setFetchError({
+                        statusCode: 500,
+                        message: "상품 목록을 불러오지 못했습니다.",
+                    });
+                }
             }
         }
 
@@ -118,19 +125,10 @@ export default function CustomerOrderPage() {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch("/api/orders", {
+            const result = await api<OrderCreateResponse>("/api/orders", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 body: JSON.stringify(requestBody),
             });
-
-            const result: RsData<OrderCreateResponse> = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.msg);
-            }
 
             // 주문 생성에 성공하면 생성된 주문의 완료 페이지로 이동한다.
             router.push(`/orders/${result.data.orderId}?created=1`);
@@ -144,6 +142,15 @@ export default function CustomerOrderPage() {
             setIsSubmitting(false);
         }
     };
+
+    if (fetchError) {
+        return (
+            <ErrorDisplay
+                statusCode={fetchError.statusCode}
+                message={fetchError.message}
+            />
+        );
+    }
 
     return (
         <>
