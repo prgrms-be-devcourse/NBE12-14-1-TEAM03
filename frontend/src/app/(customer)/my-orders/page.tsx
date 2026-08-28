@@ -159,7 +159,7 @@ export default function MyOrdersPage() {
             {orderList.length > 0 && (<h2 className="h6 mb-4">{searchedEmail}의 주문 내역</h2>)}
             <OrderTable
                 orders={orderList}
-                editPath={(orderId) => `/orders/${orderId}/edit`}
+                editPath={(orderId) => `/orders/${orderId}/edit?from=customer`}
                 removeLabel="취소"
                 onRemove={handleCancelOrder}
                 showActions={isEditable}

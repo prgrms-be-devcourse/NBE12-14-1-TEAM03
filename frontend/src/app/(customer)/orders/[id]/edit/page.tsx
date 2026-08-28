@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import QuantityControl from "@/components/common/QuantityControl";
 import Button from "@/components/ui/Button";
@@ -26,6 +26,9 @@ export default function OrderEditPage() {
   const params = useParams();
   const orderId = params?.id as string | undefined;
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const isFromAdmin = searchParams.get("from") === "admin";
 
   const [email, setEmail] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<string>("");
@@ -150,6 +153,24 @@ export default function OrderEditPage() {
     0
   );
 
+  //돌아갈 리스트 페이지
+  const handleMoveToList = () => {
+    if (isFromAdmin) {
+      const filter = searchParams.get("filter") ?? "all";
+      const date = searchParams.get("date");
+
+      const query = date
+        ? `?filter=${filter}&date=${date}`
+        : `?filter=${filter}`;
+
+      router.push(`/admin/orders${query}`);
+      return;
+    }
+
+    sessionStorage.setItem("orderEmail", email);
+    router.push("/my-orders");
+  };
+
   // 주문 수정 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,7 +208,7 @@ export default function OrderEditPage() {
           method: "PATCH",
           body: JSON.stringify(requestBody),
         });
-        router.push(`/orders/${orderId}`);
+        handleMoveToList()
         return;
       } else {
         // orderId가 없는 경우 orders 페이지로 이동
