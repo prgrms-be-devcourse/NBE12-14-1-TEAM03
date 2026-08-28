@@ -1,9 +1,11 @@
 'use client';
 
 import OrderTable from "@/components/common/OrderTable";
-import { RsData, OrderResultResponse } from "@/types/order";
+import { OrderResultResponse } from "@/types/order";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
+import ErrorDisplay from "@/components/common/ErrorDisplay";
+import { api, ApiError } from "@/lib/api";
 import { useEffect, useState, type SubmitEvent } from "react";
 
 export default function MyOrdersPage() {
@@ -12,34 +14,38 @@ export default function MyOrdersPage() {
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState("");
     const [searchedEmail, setSearchedEmail] = useState("");
+    const [fetchError, setFetchError] = useState<{
+        statusCode: number;
+        message: string;
+    } | null>(null);
 
     const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const fetchOrdersByEmail = async (targetEmail: string) => {
         try {
             setEmailError("");
+            setFetchError(null);
 
-            const res = await fetch(
+            const data = await api<OrderResultResponse[]>(
                 `/api/orders/mypage?email=${encodeURIComponent(targetEmail)}`
             );
 
-            const data: RsData<OrderResultResponse[]> = await res.json();
-
-            if (!res.ok || !data.resultCode.startsWith("200")) {
-                if (res.status === 400) {
-                    setEmailError(data.msg ?? "이메일을 확인해 주세요.");
+            setOrderList(data.data ?? []);
+            setSearchedEmail(targetEmail);
+        } catch (err) {
+            if (err instanceof ApiError) {
+                if (err.statusCode === 400) {
+                    setEmailError(err.message || "이메일을 확인해 주세요.");
                     setOrderList([]);
                     return;
                 }
-
-                alert(data.msg ?? "주문 내역 조회에 실패했습니다.")
-                return;
+                setFetchError({ statusCode: err.statusCode, message: err.message });
+            } else {
+                setFetchError({
+                    statusCode: 500,
+                    message: "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+                });
             }
-
-            setOrderList(data.data ?? []);
-            setSearchedEmail(targetEmail);
-        } catch {
-            alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.")
         }
     };
 
@@ -83,27 +89,34 @@ export default function MyOrdersPage() {
         }
 
         try {
-            const res = await fetch(`/api/orders/${orderId}`, { method: "DELETE" });
-
-
-            const data: RsData<null> = await res.json();
-
-
-            if (!res.ok || !data.resultCode?.startsWith("200")) {
-                alert(data.msg ?? "주문 취소에 실패했습니다.");
-                return;
-            }
-
+            const data = await api<null>(`/api/orders/${orderId}`, { method: "DELETE" });
             alert(data.msg);
             setOrderList((prev) => prev.filter((order) => order.id !== orderId));
-        } catch {
-            alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.")
+        } catch (err) {
+            if (err instanceof ApiError) {
+                alert(err.message || "주문 취소에 실패했습니다.");
+            } else {
+                alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+            }
         }
 
     }
 
     const isEditable = (order: OrderResultResponse) => {
         return getTodayString() <= order.shippingDate;
+    }
+
+    if (fetchError) {
+        return (
+            <ErrorDisplay
+                statusCode={fetchError.statusCode}
+                message={fetchError.message}
+                onRetry={() => {
+                    setFetchError(null);
+                    if (searchedEmail) void fetchOrdersByEmail(searchedEmail);
+                }}
+            />
+        );
     }
 
     return (
