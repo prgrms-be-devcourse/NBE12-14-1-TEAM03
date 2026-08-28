@@ -35,7 +35,7 @@ public class OrderResultService {
     @Transactional(readOnly = true)
     public List<OrderResultResponse> getAllList() {
 
-        return this.orderResultRepository.findAllByOrderByCreateDateDesc().stream()
+        return this.orderResultRepository.findAllWithItemsAndProducts().stream()
                 .map(OrderResultResponse::new)
                 .toList();
     }
@@ -43,7 +43,7 @@ public class OrderResultService {
     // [관리자] 요청한 배송일에 해당하는 거래 내역 조회
     @Transactional(readOnly = true)
     public List<MergedShipmentResponse> getMergedByShippingDate(LocalDate shippingDate) {
-        List<OrderResult> orders = this.orderResultRepository.findByShippingDate(shippingDate);
+        List<OrderResult> orders = this.orderResultRepository.findByShippingDateWithItemsAndProducts(shippingDate);
 
         // 예외처리 적용
         if (orders.isEmpty()) {
@@ -121,9 +121,9 @@ public class OrderResultService {
 
     // [고객] 내 주문내역 조회
     @Transactional(readOnly = true)
-    public List<OrderResultResponse> findMyOrders(String email) {
+    public List<OrderResultResponse> findMyOrders(String email){
 
-        return this.orderResultRepository.findByEmailOrderByCreateDateDesc(email).stream()
+        return this.orderResultRepository.findByEmailWithItemsAndProducts(email).stream()
                 .map(OrderResultResponse::new)
                 .toList();
     }
@@ -132,7 +132,7 @@ public class OrderResultService {
     @Transactional(readOnly = true)
     public OrderResultResponse findMyOrderById(Long id) {
         return new OrderResultResponse(
-                this.orderResultRepository.findById(id).orElseThrow(() ->
+                this.orderResultRepository.findByIdWithItemsAndProducts(id).orElseThrow(() ->
                         new ApiServiceException("404-1",
                                 "해당 ID의 주문 내역은 존재하지 않습니다.")));
     }
