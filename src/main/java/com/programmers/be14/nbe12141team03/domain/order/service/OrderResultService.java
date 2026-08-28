@@ -56,7 +56,7 @@ public class OrderResultService {
         // 배송일에 해당하는 주문 내역을 이메일, 배송주소, 우편번호를 기준으로 딕셔너리 생성
         Map<String, List<OrderResult>> groupByEmail = orders.stream()
                 .collect(Collectors.groupingBy(key ->
-                        key.getEmail() + "|" + key.getShippingAddress() + "|" + key.getZipCode(),
+                                key.getEmail() + "|" + key.getShippingAddress() + "|" + key.getZipCode(),
                         LinkedHashMap::new,
                         Collectors.toList()));
 
@@ -81,7 +81,7 @@ public class OrderResultService {
         Map<Long, MergedItemResponse> itemMap = new LinkedHashMap<>();
 
         for (OrderResult order : group) {
-            for (OrderItem item : order.getOrderItemList()){
+            for (OrderItem item : order.getOrderItemList()) {
                 Long productId = item.getProduct().getId();
 
                 itemMap.merge(productId,
@@ -102,7 +102,7 @@ public class OrderResultService {
             }
         }
 
-        return  new MergedShipmentResponse(
+        return new MergedShipmentResponse(
                 first.getEmail(),
                 first.getShippingDate(),
                 first.getShippingAddress(),
@@ -118,7 +118,7 @@ public class OrderResultService {
 
     // [고객] 내 주문내역 조회
     @Transactional(readOnly = true)
-    public List<OrderResultResponse> findMyOrders(String email){
+    public List<OrderResultResponse> findMyOrders(String email) {
 
         return this.orderResultRepository.findByEmail(email).reversed().stream()
                 .map(OrderResultResponse::new)
@@ -127,7 +127,7 @@ public class OrderResultService {
 
     // [고객] 선택한 주문내역의 ID를 통해 단건 조회
     @Transactional(readOnly = true)
-    public OrderResultResponse findMyOrderById(Long id){
+    public OrderResultResponse findMyOrderById(Long id) {
         return new OrderResultResponse(
                 this.orderResultRepository.findById(id).orElseThrow(() ->
                         new ApiServiceException("404-1",
@@ -137,6 +137,7 @@ public class OrderResultService {
     //고객 주문 생성
     @Transactional
     public OrderResult createOrder(OrderCreateRequest request) {
+        LocalDateTime orderedAt = LocalDateTime.now();
 
         // 주문 상품이 없는 경우 주문 생성 방지
         if (request.getItems() == null || request.getItems().isEmpty()) {
@@ -146,8 +147,9 @@ public class OrderResultService {
             );
         }
 
-        //고객 정보와 배송 정보로 주문 생성
+        // 고객 정보와 배송 정보로 주문 생성
         OrderResult orderResult = new OrderResult(
+                orderedAt,
                 request.getEmail(),
                 request.getShippingAddress(),
                 request.getZipCode()
@@ -187,7 +189,7 @@ public class OrderResultService {
 
     //주문 삭제
     @Transactional
-    public void deleteOrder(Long id){
+    public void deleteOrder(Long id) {
         OrderResult orderResult = orderResultRepository.findById(id)
                 .orElseThrow(() ->
                         new ApiServiceException(
@@ -208,7 +210,7 @@ public class OrderResultService {
 
     // 주문 수정
     @Transactional
-    public OrderResultResponse modifyOrderResult(Long id, OrderModifyRequest request){
+    public OrderResultResponse modifyOrderResult(Long id, OrderModifyRequest request) {
 
         // 주문 내역 존재 여부 예외 처리
         OrderResult origin = this.orderResultRepository.findById(id)
@@ -227,14 +229,14 @@ public class OrderResultService {
 
         // 상품 존재 여부 예외 처리 및 새로운 리스트 생성
         List<OrderItem> modifiedItemList = request.orderItemList().stream()
-                        .map(req -> {
-                            Product product = this.productRepository.findById(req.productId())
-                                    .orElseThrow(() -> new ApiServiceException(
-                                            "404-2",
-                                            "%d번 상품을 찾을 수 없습니다.".formatted(req.productId())));
-                            return new OrderItem(product, product.getPrice(), req.quantity());
-                        })
-                        .toList();
+                .map(req -> {
+                    Product product = this.productRepository.findById(req.productId())
+                            .orElseThrow(() -> new ApiServiceException(
+                                    "404-2",
+                                    "%d번 상품을 찾을 수 없습니다.".formatted(req.productId())));
+                    return new OrderItem(product, product.getPrice(), req.quantity());
+                })
+                .toList();
 
         origin.modify(
                 request.shippingAddress(),
