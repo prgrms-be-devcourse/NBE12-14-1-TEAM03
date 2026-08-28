@@ -10,6 +10,6 @@ public record MergedShipmentResponse(
         String zipCode,
         int orderCount,
         List<Long> mergedOrderIds,
-        int totalPrice,
+        long totalPrice,
         List<MergedItemResponse> orderItemList
 ) {}

@@ -38,7 +38,7 @@ public class OrderResult {
     @Column(nullable = false)
     private String zipCode;
 
-    private int totalPrice;
+    private long totalPrice;
 
     private LocalDate shippingDate; // 배송일
 
@@ -64,7 +64,11 @@ public class OrderResult {
     public void addOrderItem(OrderItem orderItem) {
         orderItemList.add(orderItem);
         orderItem.setOrderResult(this);
-        this.totalPrice += orderItem.getTotalPrice();
+        //총금액이 long 범위 초과하면 예외 발생
+        this.totalPrice = Math.addExact(
+                this.totalPrice,
+                orderItem.getTotalPrice()
+        );
     }
 
     // @EntityListeners(AuditingEntityListener.class)를 사용하면 레포지토리에서 save를 할 때 생성일자등의 생성이 동작한다고 합니다.
@@ -103,7 +107,7 @@ public class OrderResult {
 
         // 기존 주문 상품을 고아로 만들어서 DB에서 삭제
         this.orderItemList.clear();
-        this.totalPrice = 0;
+        this.totalPrice = 0L;
 
         // 주문 상품 재등록
         newItemList.forEach(this::addOrderItem);
