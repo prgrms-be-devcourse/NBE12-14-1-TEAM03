@@ -12,7 +12,7 @@ import {
 } from "@/lib/formatters";
 import OrderSummaryCard from "@/components/common/OrderSummaryCard";
 
-export default function OrderCompletePage() {
+export default function OrderDetailPage() {
   const params = useParams();
   const orderId = params?.id as string | undefined;
   const router = useRouter();
@@ -92,6 +92,7 @@ export default function OrderCompletePage() {
       <ErrorDisplay
         statusCode={fetchError.statusCode}
         message={fetchError.message}
+        homeHref={isFromAdmin ? "/admin/orders" : "/orders"}
       />
     );
   }

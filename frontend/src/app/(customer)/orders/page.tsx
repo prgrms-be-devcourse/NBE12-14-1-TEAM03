@@ -148,6 +148,7 @@ export default function CustomerOrderPage() {
             <ErrorDisplay
                 statusCode={fetchError.statusCode}
                 message={fetchError.message}
+                homeHref="/orders"
             />
         );
     }
