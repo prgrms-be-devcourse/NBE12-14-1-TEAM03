@@ -230,6 +230,7 @@ export default function OrderEditPage() {
       <ErrorDisplay
         statusCode={fetchError.statusCode}
         message={fetchError.message}
+        homeHref={isFromAdmin ? "/admin/orders" : "/orders"}
       />
     );
   }

@@ -177,6 +177,7 @@ export default function AdminOrdersPage(){
                     else if (filter === "today") void fetchShipments(todayStr());
                     else void fetchShipments(selectedDate);
                 }}
+                homeHref="/admin/orders"
             />
         ) : filter === "all" ? (
             <OrderTable

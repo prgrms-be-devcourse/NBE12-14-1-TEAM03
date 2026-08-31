@@ -115,6 +115,7 @@ export default function MyOrdersPage() {
                     setFetchError(null);
                     if (searchedEmail) void fetchOrdersByEmail(searchedEmail);
                 }}
+                homeHref="/orders"
             />
         );
     }

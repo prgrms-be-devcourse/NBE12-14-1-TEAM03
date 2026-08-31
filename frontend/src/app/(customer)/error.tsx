@@ -19,6 +19,7 @@ export default function CustomerError({
       statusCode={500}
       message={error.message || "예기치 않은 오류가 발생했습니다."}
       onRetry={reset}
+      homeHref="/orders"
     />
   );
 }

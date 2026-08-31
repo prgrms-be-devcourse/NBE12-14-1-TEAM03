@@ -65,6 +65,7 @@ export default function AdminProductsPage() {
                     statusCode={fetchError.statusCode}
                     message={fetchError.message}
                     onRetry={() => void fetchProducts()}
+                    homeHref="/admin/orders"
                 />
             ) : (
                 <div className="table-responsive">

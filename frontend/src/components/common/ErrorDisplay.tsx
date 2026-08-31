@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { usePathname, useRouter } from "next/navigation";
 
 /**
  * HTTP 상태 코드별 한글 요약 매핑.
@@ -26,6 +26,7 @@ interface ErrorDisplayProps {
   message?: string;
   /** "다시 시도" 콜백. error.tsx의 reset 함수를 전달합니다. */
   onRetry?: () => void;
+  homeHref?: string;
 }
 
 /**
@@ -40,8 +41,16 @@ export default function ErrorDisplay({
   statusCode,
   message,
   onRetry,
+  homeHref,
 }: ErrorDisplayProps) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const defaultHomeHref = pathname.startsWith("/admin")
+    ? "/admin/orders"
+    : "/orders";
+
+  const resolvedHomeHref = homeHref ?? defaultHomeHref;
 
   const statusMessage =
     STATUS_MESSAGES[statusCode] ?? "알 수 없는 오류가 발생했습니다";
@@ -70,7 +79,7 @@ export default function ErrorDisplay({
           이전 페이지로 돌아가기
         </Button>
 
-        <Button onClick={() => router.push("/orders")}>
+        <Button onClick={() => router.push(resolvedHomeHref)}>
           홈으로 돌아가기
         </Button>
       </div>
